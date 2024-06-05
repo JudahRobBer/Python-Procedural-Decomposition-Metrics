@@ -1,14 +1,20 @@
 import json
 from graph import DirectedGraph, AugmentedCallGraph
 from scalpel.call_graph.pycg import CallGraphGenerator, formats
+from functionParameterCounter import get_function_parameter_counts
+from pprint import pprint
 
-
+"""
+Module augments the call graph outputted by Scalpel by:
+cleaning it to include only function names, and labeling each node with its fan-out, fan-in, and parameter count
+"""
 
 def generate_augmented_call_graph(package:str,filename:str) -> AugmentedCallGraph:
     call_graph = __generate_call_graph(package,filename)
     fan_out = __generate_fan_out_map(call_graph)
     fan_in = __generate_fan_in_map(call_graph)
-    return AugmentedCallGraph(call_graph,fan_in,fan_out)
+    parameter_counts = get_function_parameter_counts(package,filename)
+    return AugmentedCallGraph(call_graph,fan_in,fan_out,parameter_counts)
 
 
 def __generate_call_graph(package:str,filename:str) -> dict:

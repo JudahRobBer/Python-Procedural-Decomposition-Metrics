@@ -12,9 +12,9 @@ from augmentedCallGraphGenerator import AugmentedCallGraph,generate_augmented_ca
 
 def main():
     package = "testpackage"
-    filename = "dummy.py"
+    filename = "drivetimes.py"
     augmented_call_graph = generate_augmented_call_graph(package,filename)
-    print(augmented_call_graph.count_reused_leafs())
+
 
 main()
 

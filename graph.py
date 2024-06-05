@@ -162,20 +162,21 @@ class AugmentedCallGraph(DirectedGraph):
         name:str
         fan_in:int
         fan_out:int
+        parameter_count:int
         
         def __repr__(self):
             return self.name
 
 
-    def __init__(self,adjList:dict, fan_in:dict,fan_out:dict):
+    def __init__(self,adjList:dict, fan_in:dict,fan_out:dict, parameter_counts:dict):
     
         #generate a graph object whose nodes are FunctionNodes from the data
         funcAdjList = {}
         for node, neighbors in adjList.items():
-            funcNode = self.FunctionNode(node,fan_in[node],fan_out[node])
+            funcNode = self.FunctionNode(node,fan_in[node],fan_out[node],parameter_counts[node])
             funcNeighbors = set()
             for neighbor in neighbors:
-                funcNeighbor = self.FunctionNode(neighbor,fan_in[neighbor],fan_out[neighbor])
+                funcNeighbor = self.FunctionNode(neighbor,fan_in[neighbor],fan_out[neighbor],parameter_counts[neighbor])
                 funcNeighbors.add(funcNeighbor)
             funcAdjList[funcNode] = funcNeighbors
         
