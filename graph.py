@@ -34,16 +34,16 @@ class DirectedGraph:
         if adjList is None and len(nodeSet) != 0:
             self.nodes:set = copy.deepcopy(nodeSet)
             self.edges:set = copy.deepcopy(edgeSet)
-            self.genAdjList()
+            self.__genAdjList()
         elif adjList is not None and len(nodeSet) == 0:
             self.adjList = adjList
-            self.genNodeSet()
-            self.genEdgeSet()
+            self.__genNodeSet()
+            self.__genEdgeSet()
         else:
             raise Exception("Invalid combination of parameters. Provide either a node and edge set, or an adjacency list")
     
     
-    def genAdjList(self) -> None:
+    def __genAdjList(self) -> None:
         """
         Map every vertex to set of neighbors, generating an adjacancy list
 
@@ -74,57 +74,29 @@ class DirectedGraph:
         self.adjList = copy.deepcopy(adjList)
     
 
-    def genNodeSet(self) -> None:
+    def __genNodeSet(self) -> None:
         self.nodes = {node for node in self.adjList.keys()}
 
     
-    def genEdgeSet(self) -> None:
+    def __genEdgeSet(self) -> None:
         self.edges = set()
         for node, neighbors in self.adjList.items():
             for neighbor in neighbors:
                 self.edges.add((node,neighbor))
 
     def addNode(self, node:any) -> None:
-        """
-        Add the input node to the graph
-
-        Parameters:
-        node (any): Node to be added to the graph
-
-        Returns: 
-        None
-        """
         if node not in self.nodes:
             self.nodes.add(node)
-            self.genAdjList()
+            self.__genAdjList()
     
     
     def addEdge(self, edge:tuple) -> None:
-        """
-        Add the input edge to the graph
-
-        Parameters:
-        edge (tuple): edge to be added to the graph
-
-        Returns:
-        None
-        """
         if edge not in self.edges:
             self.edges.add(edge)
-            self.genAdjList()
+            self.__genAdjList()
 
     
     def printAdjList(self) -> None:
-        """
-        Prints the adjacency list of the graph
-
-        Parameters:
-        None
-
-        Returns:
-        None
-        """
-       
         for node, neighbors in self.adjList.items():
             print(node, ": ", end="")
             print(neighbors)
@@ -132,28 +104,10 @@ class DirectedGraph:
     
     
     def printNodeSet(self) -> None:
-        """
-        Prints the vertex set of the graph
-        
-        Parameters:
-        None
-
-        Returns:
-        None
-        """
         print("Nodes: " + str(self.nodes))
     
 
     def printEdgeSet(self) -> None:
-        """
-        Prints the edge set of the graph
-
-        Parameters:
-        None
-
-        Returns:
-        None
-        """
         print("Edges: " + str(self.edges))
 
 
@@ -193,10 +147,10 @@ class AugmentedCallGraph(DirectedGraph):
         fan_out = self.__generate_fan_out_map(adjList,built_in_nodes)
         fan_in = self.__generate_fan_in_map(adjList)
         for node, neighbors in adjList.items():
-            funcNode = self.build_functionNode(node,fan_in[node],fan_out[node],parameter_counts)
+            funcNode = self.__build_functionNode(node,fan_in[node],fan_out[node],parameter_counts)
             funcNeighbors = set()
             for neighbor in neighbors:
-                funcNeighbor = self.build_functionNode(neighbor,fan_in[neighbor],fan_out[neighbor],parameter_counts)
+                funcNeighbor = self.__build_functionNode(neighbor,fan_in[neighbor],fan_out[neighbor],parameter_counts)
                 funcNeighbors.add(funcNeighbor)
             funcAdjList[funcNode] = funcNeighbors
         
@@ -227,7 +181,7 @@ class AugmentedCallGraph(DirectedGraph):
         return fan_in
 
     
-    def build_functionNode(self,name:str,fan_in:int,fan_out:int,parameter_counts:dict):
+    def __build_functionNode(self,name:str,fan_in:int,fan_out:int,parameter_counts:dict):
         if name not in parameter_counts.keys():
             return self.FunctionNode(name,fan_in,fan_out,-1,True)
         else:
