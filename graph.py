@@ -24,6 +24,7 @@ class DirectedGraph:
         Parameters:
         nodeSet (set): set of integers representing nodes
         edgeSet (set): set of tuples representing edges
+        adjList (dict): dictionary representing and adjacency list
 
         Returns:
         None

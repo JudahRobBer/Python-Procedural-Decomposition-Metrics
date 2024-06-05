@@ -7,11 +7,9 @@ class FunctionParameterCounter(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         # Count the number of parameters
         param_count = len(node.args.args)
-        # Get the function name
         function_name = node.name
-        # Store the result
         self.function_params[function_name] = param_count
-        # Continue to visit child nodes
+    
         self.generic_visit(node)
 
 def get_function_parameter_counts(package:str,filename:str):
