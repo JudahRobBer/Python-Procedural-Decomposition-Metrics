@@ -1,6 +1,8 @@
 import copy
+import dataclasses
 from dataclasses import dataclass
 import graphviz
+import networkx as nx
 
 class DirectedGraph:
     """
@@ -139,7 +141,7 @@ class DirectedGraph:
         Returns:
         None
         """
-        print("Vertices: " + str(self.vertices))
+        print("Nodes: " + str(self.nodes))
     
 
     def printEdgeSet(self) -> None:
@@ -164,24 +166,72 @@ class AugmentedCallGraph(DirectedGraph):
         fan_in:int
         fan_out:int
         parameter_count:int
+        #if the function is builtin, it is not counted by fan_out
+        #the function is built_in if it wasn't detected when parametr_counting
+        built_in:bool = False
+
         
+        """ def __repr__(self):
+            return self.name """
+        
+        #higher information representation
         def __repr__(self):
-            return self.name
+            fields = dataclasses.fields(self)
+            repr = ""
+            for v in fields:
+                repr += f'{v.name}: = {getattr(self, v.name)} '
+            return repr
+            
+        
 
 
-    def __init__(self,adjList:dict, fan_in:dict,fan_out:dict, parameter_counts:dict):
+    def __init__(self,adjList:dict,parameter_counts:dict):
     
         #generate a graph object whose nodes are FunctionNodes from the data
         funcAdjList = {}
+        built_in_nodes = self.__get_built_in_nodes(adjList,parameter_counts)
+        fan_out = self.__generate_fan_out_map(adjList,built_in_nodes)
+        fan_in = self.__generate_fan_in_map(adjList)
         for node, neighbors in adjList.items():
-            funcNode = self.FunctionNode(node,fan_in[node],fan_out[node],parameter_counts[node])
+            funcNode = self.build_functionNode(node,fan_in[node],fan_out[node],parameter_counts)
             funcNeighbors = set()
             for neighbor in neighbors:
-                funcNeighbor = self.FunctionNode(neighbor,fan_in[neighbor],fan_out[neighbor],parameter_counts[neighbor])
+                funcNeighbor = self.build_functionNode(neighbor,fan_in[neighbor],fan_out[neighbor],parameter_counts)
                 funcNeighbors.add(funcNeighbor)
             funcAdjList[funcNode] = funcNeighbors
         
         super().__init__(adjList=funcAdjList)
+
+    
+    def __get_built_in_nodes(self,adjList:dict,parameter_counts:dict):
+        """
+        We have to know if a node is built-in before we can compute the fan in,
+        which means we have to know if its built-in before we build the functionNode
+        """
+        return {node for node in adjList.keys() if node not in parameter_counts.keys()}
+
+    
+    def __generate_fan_out_map(self,adjList:dict,built_in_nodes:set) -> dict:
+        fan_out = {key : sum(1 for i in lst if i not in built_in_nodes) for key,lst in adjList.items()}
+        return fan_out
+
+    
+    def __generate_fan_in_map(self,adjList:dict) -> dict:
+        fan_in = {key : 0 for key in adjList.keys()}
+
+        for key in fan_in:
+            for subroutines in adjList.values():
+                if key in subroutines:
+                    fan_in[key] += 1
+                    
+        return fan_in
+
+    
+    def build_functionNode(self,name:str,fan_in:int,fan_out:int,parameter_counts:dict):
+        if name not in parameter_counts.keys():
+            return self.FunctionNode(name,fan_in,fan_out,-1,True)
+        else:
+            return self.FunctionNode(name,fan_in,fan_out,parameter_counts[name])
 
     
     def visualize_graph(self): 
@@ -193,6 +243,11 @@ class AugmentedCallGraph(DirectedGraph):
                 dot.edge(str(node),str(neighbor))
         
         dot.render('graph',format='png',view = True)
+
+
+    def printNodeSet(self) ->None:
+        for node in self.nodes:
+            print(node)
     
 
     def count_reused_leafs(self) -> int:
@@ -213,6 +268,12 @@ class AugmentedCallGraph(DirectedGraph):
         nonLeaf_count = sum(1 for node in self.nodes if node.fan_out != 0)
 
         return leaf_count / nonLeaf_count
+    
+
+    def calculate_transitivity(self) -> float:
+        networkxGraph = nx.Graph(self.adjList)
+        return nx.transitivity(networkxGraph)
+
 
 
 

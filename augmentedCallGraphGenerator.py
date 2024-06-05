@@ -11,10 +11,8 @@ cleaning it to include only function names, and labeling each node with its fan-
 
 def generate_augmented_call_graph(package:str,filename:str) -> AugmentedCallGraph:
     call_graph = __generate_call_graph(package,filename)
-    fan_out = __generate_fan_out_map(call_graph)
-    fan_in = __generate_fan_in_map(call_graph)
     parameter_counts = get_function_parameter_counts(package,filename)
-    return AugmentedCallGraph(call_graph,fan_in,fan_out,parameter_counts)
+    return AugmentedCallGraph(call_graph,parameter_counts)
 
 
 def __generate_call_graph(package:str,filename:str) -> dict:
@@ -55,23 +53,10 @@ def __generate_cleaned_function_map(formatted_graph:dict,filename:str) -> dict:
         newIndex = key.find(abbreviated_filename) + len(abbreviated_filename) + 1
         cleaned_key = key[newIndex::]
         #filters built-in functions
-        if len(cleaned_key) > 0 and cleaned_key.find(".") == -1:
+        if len(cleaned_key) > 0:
             cleaning_map[key] = cleaned_key
 
     return cleaning_map
 
 
-def __generate_fan_out_map(call_graph:dict) -> dict:
-    fan_out = {key : len(lst) for key,lst in call_graph.items()}
-    return fan_out
 
-def __generate_fan_in_map(call_graph:dict) -> dict:
-    fan_in = {key : 0 for key in call_graph.keys()}
-
-    for key in fan_in:
-        
-        for subroutines in call_graph.values():
-            if key in subroutines:
-                fan_in[key] += 1
-                
-    return fan_in
