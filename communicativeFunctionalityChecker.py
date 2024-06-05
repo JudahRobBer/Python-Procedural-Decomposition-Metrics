@@ -9,10 +9,10 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   
     self.vals_accessed.append(node.id)
     
-    checkUniques(node.id)
+    check_Uniques(node.id)
     self.generic_visit(node)
     
-  def checkUniques(self, name:str):
+  def check_Uniques(self, name:str):
       if (not self.unique_vals.__contains__(name)) :
         self.unique_vals.append(name)
         
