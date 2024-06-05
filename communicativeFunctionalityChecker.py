@@ -5,15 +5,15 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     self.vals_accessed = []
     self.unique_vals = []
 
+  def checkUniques(self, nme:str):
+    if (not self.unique_vals.__contains__(nme)) :
+      self.unique_vals.append(nme)
+  
   def visit_Name(self, node):
     self.vals_accessed.append(node.id)
     
     checkUniques(node.id)
     self.generic_visit(node)
-
-  def checkUniques(self, nme:str):
-    if (not self.unique_vals.__contains__(nme)) :
-      self.unique_vals.append(nme)
   
   def getCommunicativeFunctionality(self, package:str, filename: str):
     with open(f"{package}/{filename}") as file:
