@@ -12,7 +12,7 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     self.generic_visit(node)
 
   def checkUniques(nme: str) :
-    if (! self.unique_vals.__contains__(nme)) :
+    if (not self.unique_vals.__contains__(nme)) :
       self.unique_vals.append(nme)
   
   def getCommunicativeFunctionality(self, package:str, filename: str):
