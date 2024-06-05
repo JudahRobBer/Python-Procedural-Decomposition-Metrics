@@ -23,5 +23,5 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
       checker = CommunicativeFunctionalityChecker()
       checker.visit(tree)
 
-      return len(checker.vals_accessed) / len(checker.unique_vals)
+      return float(len(checker.unique_vals) / len(checker.vals_accessed))
     
