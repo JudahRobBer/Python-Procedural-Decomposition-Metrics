@@ -9,7 +9,7 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   
     self.vals_accessed.append(node.id)
     
-    check_Uniques(node.id[0])
+    check_Uniques(node.id)
     self.generic_visit(node)
     
   def check_Uniques(self, name:str):
