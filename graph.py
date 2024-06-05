@@ -256,7 +256,7 @@ class AugmentedCallGraph(DirectedGraph):
         We specifically consider the reuse of low-abstraction functions, but the principle could potentially be expanded to include
         the reuse of higher-abstraction functions
         """
-        return sum(1 for node in self.nodes if node.fan_out == 0 and node.fan_in > 1)
+        return sum(1 for node in self.nodes if node.fan_out == 0 and node.fan_in > 1 and not node.built_in)
 
 
     def get_leaf_nonLeaf_ratio(self) -> float:
@@ -264,8 +264,8 @@ class AugmentedCallGraph(DirectedGraph):
         The leaf to non-leaf ratio provides a proxy for the overall structure of the graph
         """
         
-        leaf_count = sum(1 for node in self.nodes if node.fan_out == 0)
-        nonLeaf_count = sum(1 for node in self.nodes if node.fan_out != 0)
+        leaf_count = sum(1 for node in self.nodes if node.fan_out == 0 and not node.built_in)
+        nonLeaf_count = sum(1 for node in self.nodes if node.fan_out != 0 and not node.built_in)
 
         return leaf_count / nonLeaf_count
     
