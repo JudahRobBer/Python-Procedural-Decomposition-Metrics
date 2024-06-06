@@ -5,7 +5,7 @@ def check_Uniques(lis:list, name:str):
         lis.append(name)
 
 # Represents the number of times each unique variable referenced in the method is referenced. 
-# High values represents low amounts of cohesion and a possible problem with the method.
+# Low values represents low amounts of cohesion and a possible problem with the method.
 class CommunicativeFunctionalityChecker(ast.NodeVisitor):
 
       
@@ -13,7 +13,7 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     self.vals_accessed = {}
     self.unique_vals = {}
     self.communicative_functionality = {}
-    self.func_name = ""
+    self.func_name = "global"
 
   def visit_FunctionDef(self, node):
     self.func_name = node.name
@@ -22,9 +22,9 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
       
   def visit_Name(self, node):
   
-    self.vals_accessed.append(node.id)
+    self.vals_accessed[self.func_name].append(node.id)
     
-    check_Uniques(self.unique_vals,node.id)
+    check_Uniques(self.unique_vals[self.func_name],node.id)
     self.generic_visit(node)
         
   def getCommunicativeFunctionality(self, package:str, filename: str):
@@ -35,5 +35,8 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
       checker = CommunicativeFunctionalityChecker()
       checker.visit(tree)
 
-      return float(len(checker.unique_vals) / len(checker.vals_accessed))
+      for func in self.vals_accessed :
+            self.communicative_functionality[func] = len(self.vals_accessed[func]) / len(self.unique_vals[func])
+
+      return self.communicative_functionality
     
