@@ -26,7 +26,7 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Increments the AOFD for the corresponding function when a variable not defined in it is accessed.
   def visit_Name(self, node):
-    if ((not self.assigned.__contains__(node.id)) && node.id != "print"):
+    if ((not self.assigned.__contains__(node.id)) and node.id != "print"):
       self.foreign_access_count[self.func_name] += 1
     self.generic_visit(node)
 
