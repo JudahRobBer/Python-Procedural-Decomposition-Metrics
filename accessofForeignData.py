@@ -15,13 +15,13 @@ class accessofForeignData(ast.NodeVisitor):
       self.foreign_access_count += 1
     self.generic_visit(node)
 
-def get_Foreign_Access(self, package: str, filename: str):
-  with open(f"{package}/{filename}") as file:
-    source_code = file.read()
+  def get_Foreign_Access(self, package: str, filename: str):
+    with open(f"{package}/{filename}") as file:
+      source_code = file.read()
        
-    tree = ast.parse(source_code)
-    checker = accessofForeignData()
+      tree = ast.parse(source_code)
+      checker = accessofForeignData()
 
-    checker.visit(tree)
+      checker.visit(tree)
 
-    return (checker.foreign_access_count)
+      return (checker.foreign_access_count)
