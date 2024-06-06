@@ -12,7 +12,7 @@ class accessofForeignData(ast.NodeVisitor):
     self.foreign_access_count[self.func_name] = 0 
   
   def visit_Call(self,node):
-    if (Call.Name.id != "print"):
+    if (node.func.id != "print"):
       self.foreign_access_count[self.func_name] += 1
     
   def visit_Assign(self, node):
