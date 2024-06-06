@@ -1,5 +1,9 @@
 import ast
 
+def check_Uniques(lis:list, name:str):
+      if (not list.__contains__(name)) :
+        list.append(name)
+
 class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   def __init__(self):
     self.vals_accessed = []
@@ -9,12 +13,8 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   
     self.vals_accessed.append(node.id)
     
-    check_Uniques(node.id)
+    check_Uniques(self.unique_vals,node.id)
     self.generic_visit(node)
-    
-  def check_Uniques(self, name:str):
-      if (not self.unique_vals.__contains__(name)) :
-        self.unique_vals.append(name)
         
 def getCommunicativeFunctionality(self, package:str, filename: str):
   with open(f"{package}/{filename}") as file:
