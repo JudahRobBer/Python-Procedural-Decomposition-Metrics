@@ -8,12 +8,12 @@ class accessofForeignData(ast.NodeVisitor):
   def visit_Assign(self, node):
     if (not self.assigned.__contains__(node.targets[0].id)):
       self.assigned.append(node.targets[0].id)
-    generic_visit(node)
+    self.generic_visit(node)
 
   def visit_Name(self, node):
-    if (not self.assigned.__contains__(node.targets[0].id)):
+    if (not self.assigned.__contains__(node.id)):
       self.foreign_access_count += 1
-    generic_visit(node)
+    self.generic_visit(node)
 
 def get_Foreign_Access(self, package: str, filename: str):
   with open(f"{package}/{filename}") as file:
