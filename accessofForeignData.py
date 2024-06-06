@@ -1,7 +1,7 @@
 import ast
 
 class accessofForeignData(ast.NodeVisitor):
-  def__init__(self):
+  def __init__(self):
     self.assigned = []
     self.foreign_access_count = 0
     
