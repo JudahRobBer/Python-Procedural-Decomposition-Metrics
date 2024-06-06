@@ -10,8 +10,11 @@ class accessofForeignData(ast.NodeVisitor):
       self.assigned.append(node.targets[0].id)
     self.generic_visit(node)
 
+  def visit_Call(self, node):
+    if (
+
   def visit_Name(self, node):
-    if (not self.assigned.__contains__(node.id)):
+    if ((not self.assigned.__contains__(node.id)) && node.id != "print"):
       self.foreign_access_count += 1
     self.generic_visit(node)
 
