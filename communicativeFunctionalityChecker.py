@@ -4,11 +4,22 @@ def check_Uniques(lis:list, name:str):
       if (not lis.__contains__(name)) :
         lis.append(name)
 
+# Represents the number of times each unique variable referenced in the method is referenced. 
+# High values represents low amounts of cohesion and a possible problem with the method.
 class CommunicativeFunctionalityChecker(ast.NodeVisitor):
+
+      
   def __init__(self):
-    self.vals_accessed = []
-    self.unique_vals = []
-  
+    self.vals_accessed = {}
+    self.unique_vals = {}
+    self.communicative_functionality = {}
+    self.func_name = ""
+
+  def visit_FunctionDef(self, node):
+    self.func_name = node.name
+    self.vals_accessed[self.func_name] = []
+    self.unique_vals[self.func_name] =[]
+      
   def visit_Name(self, node):
   
     self.vals_accessed.append(node.id)
