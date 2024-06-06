@@ -1,8 +1,8 @@
 import ast
 
 def check_Uniques(lis:list, name:str):
-      if (not list.__contains__(name)) :
-        list.append(name)
+      if (not lis.__contains__(name)) :
+        lis.append(name)
 
 class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   def __init__(self):
