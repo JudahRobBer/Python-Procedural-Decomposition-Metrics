@@ -16,5 +16,4 @@ b = 2
 print(add(a,b))
 
 
-#expected GLOC: 5
 

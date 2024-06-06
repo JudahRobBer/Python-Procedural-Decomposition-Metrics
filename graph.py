@@ -121,7 +121,7 @@ class AugmentedCallGraph(DirectedGraph):
         fan_out:int
         parameter_count:int
         #if the function is builtin, it is not counted by fan_out
-        #the function is built_in if it wasn't detected when parametr_counting
+        #the function is built_in if it wasn't detected when parameter_counting
         built_in:bool = False
 
         
@@ -140,12 +140,16 @@ class AugmentedCallGraph(DirectedGraph):
 
 
     def __init__(self,adjList:dict,parameter_counts:dict):
-    
-        #generate a graph object whose nodes are FunctionNodes from the data
+        """
+        generate a graph object whose nodes are FunctionNodes from the data
+        """
+        
         funcAdjList = {}
         built_in_nodes = self.__get_built_in_nodes(adjList,parameter_counts)
         fan_out = self.__generate_fan_out_map(adjList,built_in_nodes)
         fan_in = self.__generate_fan_in_map(adjList)
+        
+        #reconstruct existing nodes as function nodes
         for node, neighbors in adjList.items():
             funcNode = self.__build_functionNode(node,fan_in[node],fan_out[node],parameter_counts)
             funcNeighbors = set()
@@ -165,12 +169,19 @@ class AugmentedCallGraph(DirectedGraph):
         return {node for node in adjList.keys() if node not in parameter_counts.keys()}
 
     
+    #following constructions of dictionaries in advance are necessary for construction of frozen class FunctionNode
     def __generate_fan_out_map(self,adjList:dict,built_in_nodes:set) -> dict:
+        """
+        Asssociates Nodes with their out degree, built_in functions are not counted
+        """
         fan_out = {key : sum(1 for i in lst if i not in built_in_nodes) for key,lst in adjList.items()}
         return fan_out
 
     
     def __generate_fan_in_map(self,adjList:dict) -> dict:
+        """
+        Associates nodes with their in-degree
+        """
         fan_in = {key : 0 for key in adjList.keys()}
 
         for key in fan_in:
@@ -225,6 +236,11 @@ class AugmentedCallGraph(DirectedGraph):
     
 
     def calculate_transitivity(self) -> float:
+        """
+        Graph transitivity is the ratio of closed triangles to connected triplets of notes (K3 / P3) * 3
+        This metric serves to capture violations of the single level of abstraction. If a function calls a function
+        on the same abstraction level (they are both called by the same function), a closed triangle is formed
+        """
         networkxGraph = nx.Graph(self.adjList)
         return nx.transitivity(networkxGraph)
 

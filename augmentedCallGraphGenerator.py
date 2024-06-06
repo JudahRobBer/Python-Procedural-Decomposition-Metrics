@@ -16,6 +16,9 @@ def generate_augmented_call_graph(package:str,filename:str) -> AugmentedCallGrap
 
 
 def __generate_call_graph(package:str,filename:str) -> dict:
+    """
+    Generates unformatted graph using scalpel, removes unnecessary information and returns it
+    """
     cg_generator = CallGraphGenerator([f"./{package}/{filename}"], filename)
     cg_generator.analyze()
     formatter = formats.Simple(cg_generator)
@@ -25,6 +28,10 @@ def __generate_call_graph(package:str,filename:str) -> dict:
 
 
 def __clean_formatted_graph(formatted_graph:dict,filename:str) -> dict:
+    """
+    Scalpel Call graph includes information in the node such as the package and module name,
+    deemed irrelevant for our single file use-case
+    """
     cleaning_map = __generate_cleaned_function_map(formatted_graph,filename)
     cleaned_graph = {}
 

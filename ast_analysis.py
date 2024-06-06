@@ -13,15 +13,13 @@ class FunctionParameterCounter(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def get_function_parameter_counts(package:str,filename:str):
-    with open(f"{package}/{filename}") as file:
-        source_code = file.read()
-       
-        tree = ast.parse(source_code)
-        counter = FunctionParameterCounter()
-        counter.visit(tree)
-        
-        return counter.function_params
+def get_function_parameter_counts(package:str,filename:str) -> dict:
+    """
+    generates a map of function names to their parameter counts
+    """
+    counter = FunctionParameterCounter()
+    __traverse_graph_utility(package,filename,counter)
+    return counter.function_params
 
 
 class GlobalCodeVisitor(ast.NodeVisitor):
@@ -42,19 +40,22 @@ class GlobalCodeVisitor(ast.NodeVisitor):
         self.information_count += 1
         super().generic_visit(node)
 
-    def get_total_global_code(self):
-        return self.information_count
 
 
 def get_global_code_volume(package:str,filename:str) -> int:
+    visitor = GlobalCodeVisitor()
+    __traverse_graph_utility(package,filename,visitor)
+    return visitor.information_count
+
+
+def __traverse_graph_utility(package:str,filename:str, visitorType:ast.NodeVisitor) -> None:
+    """
+    Utility function to handle generic ast parsing
+    """
     with open(f"{package}/{filename}") as file:
         source = file.read()
         tree = ast.parse(source)
-        
-        visitor = GlobalCodeVisitor()
+        visitor = visitorType
         visitor.visit(tree)
-        
-        return visitor.get_total_global_code()
 
-
-
+    
