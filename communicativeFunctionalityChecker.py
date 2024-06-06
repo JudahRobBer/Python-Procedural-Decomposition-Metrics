@@ -19,7 +19,9 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
   def visit_FunctionDef(self, node):
     self.func_name = node.name
     self.vals_accessed[self.func_name] = []
-    self.unique_vals[self.func_name] =[]
+    self.unique_vals[self.func_name] = []
+
+    self.generic_visit(node)
 
   #Registers every variable, adding them to the vals_accessed list for the function and the corresponding unique_vals list if appropriate.
   def visit_Name(self, node):
@@ -30,16 +32,15 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     self.generic_visit(node)
 
   #Calculates the communicative functionality for each method and returns the results in a list.
-  def getCommunicativeFunctionality(self, package:str, filename: str):
-    with open(f"{package}/{filename}") as file:
-      source_code = file.read()
+def getCommunicativeFunctionality(package:str, filename: str):
+  with open(f"{package}/{filename}") as file:
+    source_code = file.read()
        
-      tree = ast.parse(source_code)
-      checker = CommunicativeFunctionalityChecker()
-      checker.visit(tree)
+    tree = ast.parse(source_code)
+    checker = CommunicativeFunctionalityChecker()
+    checker.generic_visit(tree)
 
-      for func in self.vals_accessed :
-            self.communicative_functionality[func] = len(self.vals_accessed[func]) / len(self.unique_vals[func])
+    for func in checker.vals_accessed :
+      checker.communicative_functionality[func] = len(checker.vals_accessed[func]) / len(checker.unique_vals[func])
 
-      return self.communicative_functionality
-    
+    return checker.communicative_functionality
