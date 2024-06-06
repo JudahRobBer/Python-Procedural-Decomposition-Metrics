@@ -1,0 +1,14 @@
+import radon.complexity
+import os
+
+def get_cyclomatic_complexity_dictionary(package:str,filename:str):
+    with open(f"{package}/{filename}") as file:
+        source = file.read()
+        complexities = radon.complexity.cc_visit(source)
+
+        ret_Dict = {}
+
+        for Function in complexities:
+            ret_Dict[Function.name] = Function.complexity
+
+        return ret_Dict
