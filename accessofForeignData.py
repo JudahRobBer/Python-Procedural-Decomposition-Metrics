@@ -2,12 +2,18 @@ import ast
 
 class accessofForeignData(ast.NodeVisitor):
   def __init__(self):
+    self.func_name = ""
     self.assigned = []
-    self.foreign_access_count = 0
+    self.foreign_access_count = {}
 
+  def visit_FunctionDef(self, node):
+    self.func_name = node.name
+    self.assigned = []
+    self.foreign_access_count[self.func_name] = 0 
+  
   def visit_Call(self,node):
     if (Call.Name.id != "print"):
-      self.foreign_access_count += 1
+      self.foreign_access_count[self.func_name] += 1
     
   def visit_Assign(self, node):
     if (not self.assigned.__contains__(node.targets[0].id)):
@@ -16,7 +22,7 @@ class accessofForeignData(ast.NodeVisitor):
 
   def visit_Name(self, node):
     if ((not self.assigned.__contains__(node.id)) && node.id != "print"):
-      self.foreign_access_count += 1
+      self.foreign_access_count[self.func_name] += 1
     self.generic_visit(node)
 
   def get_Foreign_Access(self, package: str, filename: str):
