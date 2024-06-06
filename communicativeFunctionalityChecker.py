@@ -22,7 +22,7 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
        
       tree = ast.parse(source_code)
       checker = CommunicativeFunctionalityChecker()
-    checker.visit(tree)
+      checker.visit(tree)
 
-    return float(len(checker.unique_vals) / len(checker.vals_accessed))
+      return float(len(checker.unique_vals) / len(checker.vals_accessed))
     
