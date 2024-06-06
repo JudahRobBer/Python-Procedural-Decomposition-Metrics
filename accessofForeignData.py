@@ -37,6 +37,6 @@ class accessofForeignData(ast.NodeVisitor):
       tree = ast.parse(source_code)
       checker = accessofForeignData()
 
-      checker.visit(tree)
+      checker.generic_visit(tree)
       # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
       return (checker.foreign_access_count)
