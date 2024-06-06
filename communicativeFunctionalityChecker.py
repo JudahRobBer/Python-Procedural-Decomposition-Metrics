@@ -16,12 +16,12 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     check_Uniques(self.unique_vals,node.id)
     self.generic_visit(node)
         
-def getCommunicativeFunctionality(self, package:str, filename: str):
-  with open(f"{package}/{filename}") as file:
-    source_code = file.read()
+  def getCommunicativeFunctionality(self, package:str, filename: str):
+    with open(f"{package}/{filename}") as file:
+      source_code = file.read()
        
-    tree = ast.parse(source_code)
-    checker = CommunicativeFunctionalityChecker()
+      tree = ast.parse(source_code)
+      checker = CommunicativeFunctionalityChecker()
     checker.visit(tree)
 
     return float(len(checker.unique_vals) / len(checker.vals_accessed))
