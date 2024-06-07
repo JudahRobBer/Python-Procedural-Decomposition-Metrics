@@ -20,7 +20,7 @@ def get_average_cyclomatic_complexity(package:str,filename:str) -> float:
         if len(complexities) > 0:
             return total / len(complexities)
         #code must be entirely global, no direct way to measure CC
-        return -1
+        return 0
 
     
 
@@ -54,4 +54,4 @@ def get_average_cognitive_complexity(package:str,filename:str) -> float:
         return total / len(csvLines)
     
     #totally global code
-    return -1
+    return 0

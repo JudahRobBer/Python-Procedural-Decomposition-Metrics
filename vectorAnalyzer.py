@@ -11,12 +11,17 @@ def analyze_vectors():
     
     solution_vector = generate_vector_from_file(package,decomposed)
     comparison_vector = generate_vector_from_file(package,globallyScoped)
+    print("Original solution vector: ", solution_vector)
+    print("Original global vector: ", comparison_vector)
     
     normalized_solution = normalize_vector(solution_vector)
+    print("norm_solution: ",normalized_solution)
     normalized_comparison = normalize_vector(comparison_vector)
+    print("norm global: ",normalized_comparison)
     
-    similarity = cosine_similarity(normalized_solution,normalized_comparison)
+    #similarity = cosine_similarity(normalized_solution,normalized_comparison)
     most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
+    print(generate_suggestion(most_significant_difference))
     
     
 
@@ -51,8 +56,13 @@ def get_most_significant_difference(norm_solution_vector:np.array, norm_comparis
     diff_vector = norm_solution_vector - norm_comparison_vector
     #sort vector maintaining index as (original index,value) tuples
     labeled_sorted_diff_vector = sorted(enumerate(diff_vector),key= lambda x: x[1])
-    
+    print("difference vector: ",labeled_sorted_diff_vector)
     most_significant_diff = labeled_sorted_diff_vector[0]
+
+    #if the most significant difference relates to the graph structure, but the students code is totally global,
+    #prioritize global structure
+    if (norm_comparison_vector[data_order.leaf_ratio] == 0): #no nodes deteced
+        return data_order.global_code_volume
     
     #there is in fact a negative feature detected, return the original index of the feature
     if most_significant_diff[1] < 0:
