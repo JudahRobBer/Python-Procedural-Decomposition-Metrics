@@ -8,7 +8,7 @@ import numpy as np
 from enum import IntEnum
 
 class data_order(IntEnum):
-    code_volume = 0
+    global_code_volume = 0
     reused_nodes = 1
     leaf_ratio = 2
     transitivity = 3

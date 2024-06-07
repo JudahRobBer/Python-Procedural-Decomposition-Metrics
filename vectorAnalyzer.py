@@ -1,4 +1,4 @@
-from decompositionVectorGenerator import generate_vector_from_file, DATA_ORDER
+from decompositionVectorGenerator import generate_vector_from_file, data_order
 import numpy as np
 """
 Module to handle the comparison and analysis of procedural decomposition vectors
@@ -14,15 +14,11 @@ def analyze_vectors():
     
     normalized_solution = normalize_vector(solution_vector)
     normalized_comparison = normalize_vector(comparison_vector)
-    #similarity = cosine_similarity(normalized_solution,normalized_comparison)
-
-    #print("Similarity: " + similarity)
-
-    #testing sorting
-    test1 = np.array([1,3,4])
-    test2 = np.array([3,2,4])
-    feature = get_most_significant_difference(test1,test2)
-    print("Most different index: ",feature)
+    
+    similarity = cosine_similarity(normalized_solution,normalized_comparison)
+    most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
+    
+    
 
 
 def normalize_vector(vector:np.array) -> np.array:
@@ -65,6 +61,40 @@ def get_most_significant_difference(norm_solution_vector:np.array, norm_comparis
     #The comparison vector was better than the solution vector on all measurements
     return None
 
+
+def generate_suggestion(feature:int) -> str:
+    match feature:
+        case data_order.global_code_volume:
+            return """
+                Our analysis shows that you have significantly more code written in the global scope 
+                compared to an optimally decomposed solution. Consider moving code from a global scope into an
+                appropriete subroutine or main
+            """
+        case data_order.reused_nodes:
+            return """
+            Our analysis shows that you reused fewer functions than our optimally decomposed solution.
+            Look for repetition in your code and try to create reusable functions
+            """
+        
+        case data_order.leaf_ratio:
+            return """
+            Our analysis shows that compared to our optimally decomposed solution, your ratio of 
+            low abstraction to high abstraction functions was lower, meaning you had proportionally more
+            complex functions. Consider separating more functionality into smaller functions
+            """
+        
+        case data_order.transitivity:
+            return """
+            Our analysis shows that you had more usages of multiple levels of abstraction than our
+            optimally decomposed solution. Check through your functions to ensure that within each function
+            you maintain a single level of abstraction whenever possible
+            """
+        case data_order.cyc_complexity | data_order.cog_complexity:
+            return """
+            Our analysis shows that on average your functions were more complex than the functions in our 
+            optimally decomposed solution. Ensure that your functions are following the single responsibility principle
+            by making sure that all of the code in your function works together to accomplish a single purpose
+            """
 
     
 
