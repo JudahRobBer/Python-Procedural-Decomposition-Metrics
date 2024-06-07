@@ -17,7 +17,9 @@ class accessofForeignData(ast.NodeVisitor):
   # Increments the AOFD by one for each call of an outside function.
   def visit_Call(self,node):
     if ((ast.Name)(node.func)).id != "print":
-          self.generic_visit(node)
+      self.generic_visit(node)
+    else:
+      self.generic_visit(node.args)
 
   # Adds assigned variables to the corresponding list. When these variables appear later in the function, they do not increase the AOFD.
   def visit_Assign(self, node):
