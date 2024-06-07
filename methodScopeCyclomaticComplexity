@@ -1,0 +1,16 @@
+import radon.complexity
+import os
+
+# Provides the cyclomatic complexity of each method in dictionary format.
+def get_cyclomatic_complexity_dictionary(package:str,filename:str):
+    with open(f"{package}/{filename}") as file:
+        source = file.read()
+        complexities = radon.complexity.cc_visit(source)
+
+        ret_Dict = {}
+
+        # Populates the dictionary.
+        for Function in complexities:
+            ret_Dict[Function.name] = Function.complexity
+
+        return ret_Dict
