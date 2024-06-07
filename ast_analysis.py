@@ -1,7 +1,7 @@
 import ast
 
 # Generic Utilities ------------------------------------------------------
-def __traverse_graph_utility(package:str,filename:str, visitorType:ast.NodeVisitor) -> None:
+def traverse_graph_utility(package:str,filename:str, visitorType:ast.NodeVisitor) -> None:
     """
     Utility function to handle generic ast parsing
     """
@@ -33,7 +33,7 @@ def get_function_parameter_counts(package:str,filename:str) -> dict:
     generates a map of function names to their parameter counts
     """
     counter = FunctionParameterCounter()
-    __traverse_graph_utility(package,filename,counter)
+    traverse_graph_utility(package,filename,counter)
     return counter.function_params
 
 
@@ -61,7 +61,7 @@ class GlobalCodeVisitor(ast.NodeVisitor):
 
 def get_global_code_volume(package:str,filename:str) -> int:
     visitor = GlobalCodeVisitor()
-    __traverse_graph_utility(package,filename,visitor)
+    traverse_graph_utility(package,filename,visitor)
     return visitor.information_count
 
 

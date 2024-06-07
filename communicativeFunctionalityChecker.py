@@ -1,4 +1,6 @@
 import ast
+from ast_analysis import traverse_graph_utility
+
 
 def check_Uniques(lis:list, name:str):
       if (not lis.__contains__(name)) :
@@ -44,14 +46,11 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
 
   #Calculates the communicative functionality for each method and returns the results in a list.
 def getCommunicativeFunctionality(package:str, filename: str):
-  with open(f"{package}/{filename}") as file:
-    source_code = file.read()
-       
-    tree = ast.parse(source_code)
-    checker = CommunicativeFunctionalityChecker()
-    checker.generic_visit(tree)
+  checker = CommunicativeFunctionalityChecker()
+  traverse_graph_utility(package,filename,checker)
+  
 
-    for func in checker.vals_accessed :
-      checker.communicative_functionality[func] = len(checker.vals_accessed[func]) / len(checker.unique_vals[func])
+  for func in checker.vals_accessed :
+    checker.communicative_functionality[func] = len(checker.vals_accessed[func]) / len(checker.unique_vals[func])
 
-    return checker.communicative_functionality
+  return checker.communicative_functionality
