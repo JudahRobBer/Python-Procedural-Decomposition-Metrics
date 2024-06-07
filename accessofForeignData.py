@@ -5,6 +5,7 @@ class accessofForeignData(ast.NodeVisitor):
     self.func_name = "global"
     self.assigned = []
     self.foreign_access_count = {"global": 0}
+    self.allowed_names = ["print","range","import","len","int","str","float"]
 
   # Adds a new key to the return dictionary for each function.
   # Resets the list of variables defined in that function.
@@ -14,12 +15,16 @@ class accessofForeignData(ast.NodeVisitor):
     self.foreign_access_count[self.func_name] = 0 
     self.generic_visit(node)
 
-  # Increments the AOFD by one for each call of an outside function.
-  def visit_Call(self,node):
-    if (((ast.Name)(node.func)).id != "print"):
-      self.generic_visit(node)
-    else :
-      self.generic_visit(node.args)
+  # Program should not count repeated calls of an imported library's methods as foreign.
+  def visit_Import(self, node):
+    self.allowed_names.append(node.names[0].name)
+    self.generic_visit(node)
+
+  # Adds index variables corresponding to for loops to the "assigned" list.
+  def visit_For(self, node):
+    if (not self.assigned.__contains__(node.target.id)):
+      self.assigned.append(node.target.id)
+    self.generic_visit(node)
 
   # Adds assigned variables to the corresponding list. When these variables appear later in the function, they do not increase the AOFD.
   def visit_Assign(self, node):
@@ -29,7 +34,13 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Increments the AOFD for the corresponding function when a variable not defined in it is accessed.
   def visit_Name(self, node):
-    if ((not self.assigned.__contains__(node.id)) and node.id != "print"):
+    allowed = True
+    for name in self.allowed_names:
+      if name == node.id:
+        allowed = False
+        break
+    
+    if ((not self.assigned.__contains__(node.id)) and allowed):
       self.foreign_access_count[self.func_name] += 1
     self.generic_visit(node)
 
@@ -39,6 +50,10 @@ class accessofForeignData(ast.NodeVisitor):
        
       tree = ast.parse(source_code)
       checker = accessofForeignData()
+
+      checker.generic_visit(tree)
+      # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
+      return (checker.foreign_access_count)
 
       checker.generic_visit(tree)
       # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
