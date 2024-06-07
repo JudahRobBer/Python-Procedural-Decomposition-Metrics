@@ -10,8 +10,8 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
 
   #Initializes the dictionaries and a value for the function name. Code that appears before the first function defiinition is global.    
   def __init__(self):
-    self.vals_accessed = {}
-    self.unique_vals = {}
+    self.vals_accessed = {"global":[]}
+    self.unique_vals = {"global":[]}
     self.communicative_functionality = {}
     self.func_name = "global"
 
@@ -22,6 +22,17 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     self.unique_vals[self.func_name] = []
 
     self.generic_visit(node)
+
+  #Should not process built in functions as variables, but should process attribute calls on collections.
+  def visit_Call(self, node):
+    if self.unique_vals.__contains__(((ast.Name)(node.func)).id):
+      self.generic_visit(node)
+    else:
+      self.generic_visit(node.args[0])
+
+  #Should not process imports.
+  def visit_Import(self,node):
+    pass
 
   #Registers every variable, adding them to the vals_accessed list for the function and the corresponding unique_vals list if appropriate.
   def visit_Name(self, node):
