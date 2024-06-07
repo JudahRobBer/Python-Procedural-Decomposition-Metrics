@@ -2,9 +2,9 @@ import ast
 
 class accessofForeignData(ast.NodeVisitor):
   def __init__(self):
-    self.func_name = ""
+    self.func_name = "global"
     self.assigned = []
-    self.foreign_access_count = {}
+    self.foreign_access_count = {"global": 0}
 
   # Adds a new key to the return dictionary for each function.
   # Resets the list of variables defined in that function.
@@ -16,9 +16,9 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Increments the AOFD by one for each call of an outside function.
   def visit_Call(self,node):
-    if ((ast.Name)(node.func)).id != "print":
+    if (((ast.Name)(node.func)).id != "print"):
       self.generic_visit(node)
-    else:
+    else :
       self.generic_visit(node.args)
 
   # Adds assigned variables to the corresponding list. When these variables appear later in the function, they do not increase the AOFD.
