@@ -28,7 +28,8 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     if self.unique_vals.__contains__(((ast.Name)(node.func)).id):
       self.generic_visit(node)
     else:
-      self.generic_visit(node.args[0])
+      if len(node.args) > 0:
+        self.generic_visit(node.args[0])
 
   #Should not process imports.
   def visit_Import(self,node):
