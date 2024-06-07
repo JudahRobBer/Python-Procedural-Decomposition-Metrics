@@ -17,7 +17,11 @@ def get_average_cyclomatic_complexity(package:str,filename:str) -> float:
         source = file.read()
         complexities = radon.complexity.cc_visit(source)
         total = sum(func.complexity for func in complexities)
-        return total / len(complexities)
+        if len(complexities) > 0:
+            return total / len(complexities)
+        #code must be entirely global, no direct way to measure CC
+        return -1
+
     
 
 def get_average_cognitive_complexity(package:str,filename:str) -> float:
@@ -46,4 +50,8 @@ def get_average_cognitive_complexity(package:str,filename:str) -> float:
     
     #last index in the line represents the complexity
     total = sum(int(line[-1]) for line in csvLines)
-    return total / len(csvLines)
+    if len(csvLines) > 0:
+        return total / len(csvLines)
+    
+    #totally global code
+    return -1

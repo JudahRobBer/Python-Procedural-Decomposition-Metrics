@@ -231,8 +231,9 @@ class AugmentedCallGraph(DirectedGraph):
         
         leaf_count = sum(1 for node in self.nodes if node.fan_out == 0 and not node.built_in)
         nonLeaf_count = sum(1 for node in self.nodes if node.fan_out != 0 and not node.built_in)
-
-        return leaf_count / nonLeaf_count
+        if nonLeaf_count > 0:
+            return leaf_count / nonLeaf_count
+        return 0
     
 
     def calculate_transitivity(self) -> float:
