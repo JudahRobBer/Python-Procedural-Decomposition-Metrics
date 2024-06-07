@@ -78,12 +78,12 @@ def generate_suggestion(feature:int) -> str:
             return """
                 Our analysis shows that you have significantly more code written in the global scope 
                 compared to an optimally decomposed solution. Consider moving code from a global scope into an
-                appropriete subroutine or main
+                appropriate subroutine, or main.
             """
         case data_order.reused_nodes:
             return """
             Our analysis shows that you reused fewer functions than our optimally decomposed solution.
-            Look for repetition in your code and try to create reusable functions
+            Look for repetition in your code and try to create small, reusable functions.
             """
         
         case data_order.leaf_ratio:
@@ -103,7 +103,7 @@ def generate_suggestion(feature:int) -> str:
             return """
             Our analysis shows that on average your functions were more complex than the functions in our 
             optimally decomposed solution. Ensure that your functions are following the single responsibility principle
-            by making sure that all of the code in your function works together to accomplish a single purpose
+            by making sure that all of the code in your function works together to accomplish a single, concise purpose
             """
 
     

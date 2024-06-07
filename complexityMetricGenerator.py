@@ -9,18 +9,32 @@ import os
 import csv
 
 
+# Provides the cyclomatic complexity of each method in dictionary format.
+def get_cyclomatic_complexity_dictionary(package:str,filename:str):
+    with open(f"{package}/{filename}") as file:
+        source = file.read()
+        complexities = radon.complexity.cc_visit(source)
+
+        ret_Dict = {}
+
+        # Populates the dictionary.
+        for Function in complexities:
+            ret_Dict[Function.name] = Function.complexity
+
+        return ret_Dict
+
+
+
 def get_average_cyclomatic_complexity(package:str,filename:str) -> float:
     """
     Use Radon to get average cyclomatic complexity per function
     """
-    with open(f"{package}/{filename}") as file:
-        source = file.read()
-        complexities = radon.complexity.cc_visit(source)
-        total = sum(func.complexity for func in complexities)
-        if len(complexities) > 0:
-            return total / len(complexities)
-        #code must be entirely global, no direct way to measure CC
-        return 0
+    complexity_dictionary = get_cyclomatic_complexity_dictionary(package,filename)
+    if len(complexity_dictionary) != 0:
+        return sum(value for value in complexity_dictionary.values()) / len(complexity_dictionary)
+
+    #empty case, no functions
+    return 0
 
     
 

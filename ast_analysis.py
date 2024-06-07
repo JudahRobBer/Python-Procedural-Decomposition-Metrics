@@ -1,5 +1,20 @@
 import ast
 
+# Generic Utilities ------------------------------------------------------
+def __traverse_graph_utility(package:str,filename:str, visitorType:ast.NodeVisitor) -> None:
+    """
+    Utility function to handle generic ast parsing
+    """
+    with open(f"{package}/{filename}") as file:
+        source = file.read()
+        tree = ast.parse(source)
+        visitor = visitorType
+        visitor.visit(tree)
+
+
+
+# Function Parameter Counting ----------------------------------------
+
 class FunctionParameterCounter(ast.NodeVisitor):
     def __init__(self):
         self.function_params = {}
@@ -21,6 +36,8 @@ def get_function_parameter_counts(package:str,filename:str) -> dict:
     __traverse_graph_utility(package,filename,counter)
     return counter.function_params
 
+
+# Global Code Volume Counting -------------------------------------
 
 class GlobalCodeVisitor(ast.NodeVisitor):
     
@@ -48,14 +65,6 @@ def get_global_code_volume(package:str,filename:str) -> int:
     return visitor.information_count
 
 
-def __traverse_graph_utility(package:str,filename:str, visitorType:ast.NodeVisitor) -> None:
-    """
-    Utility function to handle generic ast parsing
-    """
-    with open(f"{package}/{filename}") as file:
-        source = file.read()
-        tree = ast.parse(source)
-        visitor = visitorType
-        visitor.visit(tree)
+
 
     
