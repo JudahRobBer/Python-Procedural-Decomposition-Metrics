@@ -36,3 +36,20 @@ def generate_vector_from_file(package:str, filename:str) -> np.array:
            transitivity,avg_cyclomatic_complexity, avg_cognitive_complexity]
     
     return np.array(lst,dtype=float)
+
+
+def gen_labeled_vector(vector:np.array) -> dict:
+    """
+    Generate a labeled form of the vector for use in writing data
+    Pythons dicts are preferred for this purpose because the generated list is used 
+    for csv writing, rather than computation
+    """
+    index = 0
+    data_dict = {}
+    for data_type in data_order:
+        data_dict[data_type.name] = vector[index]
+        index += 1
+    
+    return data_dict
+
+

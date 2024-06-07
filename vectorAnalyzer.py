@@ -1,9 +1,41 @@
-from decompositionVectorGenerator import generate_vector_from_file, data_order
+from decompositionVectorGenerator import generate_vector_from_file, gen_labeled_vector, data_order
 import numpy as np
+import os
+import csv
 """
 Module to handle the comparison and analysis of procedural decomposition vectors
 """
 
+def analyze_test_data():
+    """
+    Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
+    
+    1) Iterate over every file
+    2) Generate analysis for each file
+    3) write formatted analysis to a csv file
+    """
+
+    def write_to_csv(data:list,headers:list) -> None:
+        with open(output_file, 'w') as csv_file:
+            writer = csv.DictWriter(csv_file,fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(data)
+
+    #analyze data
+    directory = "testpackage"
+    output_file = "metric_outputs/test_table.csv"
+    all_data = []
+    for item in os.scandir(directory):
+        data = generate_vector_from_file(directory,item.name) #for use in computation
+        labeled_data = gen_labeled_vector(data) #for use in storage
+        all_data.append(labeled_data)
+    
+    #header names
+    fields = [data_type.name for data_type in data_order]
+
+    write_to_csv(all_data,fields)
+
+    
 def analyze_vectors():
     package = "testpackage"
     decomposed = "drivetimes.py"
@@ -22,6 +54,8 @@ def analyze_vectors():
     #similarity = cosine_similarity(normalized_solution,normalized_comparison)
     most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
     print(generate_suggestion(most_significant_difference))
+
+
     
     
 
@@ -107,4 +141,4 @@ def generate_suggestion(feature:int) -> str:
             """
 
 
-analyze_vectors()
+analyze_test_data()
