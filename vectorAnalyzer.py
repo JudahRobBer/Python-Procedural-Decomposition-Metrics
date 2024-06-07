@@ -106,6 +106,5 @@ def generate_suggestion(feature:int) -> str:
             by making sure that all of the code in your function works together to accomplish a single, concise purpose
             """
 
-    
 
 analyze_vectors()

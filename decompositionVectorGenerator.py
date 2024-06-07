@@ -7,6 +7,9 @@ from ast_analysis import get_global_code_volume
 import numpy as np
 from enum import IntEnum
 
+
+#enum matching the type of data to its index in the original vector
+#used for later analysis of the data to make code more explicit
 class data_order(IntEnum):
     global_code_volume = 0
     reused_nodes = 1
