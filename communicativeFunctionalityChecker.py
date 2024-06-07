@@ -1,7 +1,6 @@
 import ast
 from ast_analysis import traverse_graph_utility
 
-
 def check_Uniques(lis:list, name:str):
       if (not lis.__contains__(name)) :
         lis.append(name)
@@ -30,8 +29,8 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
     if self.unique_vals.__contains__(((ast.Name)(node.func)).id):
       self.generic_visit(node)
     else:
-      if len(node.args) > 0:
-        self.generic_visit(node.args[0])
+      for i in range(len(node.args)):
+        self.generic_visit(node.args[i])
 
   #Should not process imports.
   def visit_Import(self,node):
@@ -39,19 +38,21 @@ class CommunicativeFunctionalityChecker(ast.NodeVisitor):
 
   #Registers every variable, adding them to the vals_accessed list for the function and the corresponding unique_vals list if appropriate.
   def visit_Name(self, node):
-  
-    self.vals_accessed[self.func_name].append(node.id)
+    if node.id != "int" and node.id != "str" and node.id != "float" and node.id != "bool" and node.id != "list" and node.id != "dict":
+      self.vals_accessed[self.func_name].append(node.id)
     
-    check_Uniques(self.unique_vals[self.func_name],node.id)
+      check_Uniques(self.unique_vals[self.func_name],node.id)
     self.generic_visit(node)
 
   #Calculates the communicative functionality for each method and returns the results in a list.
 def getCommunicativeFunctionality(package:str, filename: str):
   checker = CommunicativeFunctionalityChecker()
   traverse_graph_utility(package,filename,checker)
-  
 
   for func in checker.vals_accessed :
-    checker.communicative_functionality[func] = len(checker.vals_accessed[func]) / len(checker.unique_vals[func])
+    if len(checker.unique_vals[func]) == 0:
+      checker.communicative_functionality[func] = 0
+    else:
+      checker.communicative_functionality[func] = len(checker.vals_accessed[func]) / len(checker.unique_vals[func])
 
   return checker.communicative_functionality
