@@ -7,7 +7,7 @@ Returns data as an average of each metric for the respective functions
 import radon.complexity
 import os
 import csv
-
+import time
 
 # Provides the cyclomatic complexity of each method in dictionary format.
 def get_cyclomatic_complexity_dictionary(package:str,filename:str):
@@ -49,9 +49,13 @@ def get_average_cognitive_complexity(package:str,filename:str) -> float:
 
     
     def read_csv_file():
-        with open("complexipy.csv") as data:
-            csvLines = list(csv.reader(data))
-            return csvLines[1::] #ignore header line
+        try:
+            with open("complexipy.csv") as data:
+                csvLines = list(csv.reader(data))
+                return csvLines[1::] #ignore header line
+        except FileNotFoundError:
+            print("Couldn't read csv file?")
+            return None
             
                 
     def delete_csv_file():
@@ -63,9 +67,10 @@ def get_average_cognitive_complexity(package:str,filename:str) -> float:
     delete_csv_file()
     
     #last index in the line represents the complexity
-    total = sum(int(line[-1]) for line in csvLines)
-    if len(csvLines) > 0:
-        return total / len(csvLines)
+    if csvLines is not None and len(csvLines) > 0:
+        total = sum(int(line[-1]) for line in csvLines)
+        if len(csvLines) > 0:
+            return total / len(csvLines)
     
     #totally global code
     return 0

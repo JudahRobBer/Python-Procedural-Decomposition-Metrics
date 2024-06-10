@@ -15,28 +15,41 @@ def analyze_test_data():
     3) write formatted analysis to a csv file
     """
 
-    def write_to_csv(data:list,headers:list) -> None:
-        with open(output_file, 'w') as csv_file:
+    def write_to_csv(data:list,headers:list,output_file:str) -> None:
+        with open(f"{output_directory}/{output_file}", 'w') as csv_file:
             writer = csv.DictWriter(csv_file,fieldnames=headers)
             writer.writeheader()
             writer.writerows(data)
 
     #analyze data
-    directory = "testpackage"
-    output_file = "metric_outputs/test_table.csv"
-    all_data = []
-    for item in os.scandir(directory):
-        data = generate_vector_from_file(directory,item.name) #for use in computation
-        labeled_data = gen_labeled_vector(data) #for use in storage
-        all_data.append(labeled_data)
+    directory = "student_code"
+    output_directory = "metric_outputs"
+    output_files = {"hw2_garden.csv","hw2_owls.csv","hw2_tower.csv"}
+    all_data = {file : [] for file in output_files}
+    for student in os.scandir(directory):
+        print(student.name)
+        if student.is_dir():
+            for item in os.scandir(student):
+                data = generate_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
+                labeled_data = gen_labeled_vector(data) #for use in storage
+                labeled_data["id"] = student.name
+                output_file = item.name[:item.name.find(".py")] + ".csv"
+                print(output_file)
+                if output_file in output_files:
+                    all_data[output_file].append(labeled_data)
     
     #header names
-    fields = [data_type.name for data_type in data_order]
+    fields = ["id"]
+    fields += [data_type.name for data_type in data_order]
+    for file, data in all_data.items():
+        write_to_csv(data,fields,file)
 
-    write_to_csv(all_data,fields)
 
     
 def analyze_vectors():
+    """
+    function documents relevant analysis behavior and provides sample output
+    """
     package = "testpackage"
     decomposed = "drivetimes.py"
     globallyScoped = "drivetimesGlobal.py"
@@ -51,8 +64,9 @@ def analyze_vectors():
     normalized_comparison = normalize_vector(comparison_vector)
     print("norm global: ",normalized_comparison)
     
-    #similarity = cosine_similarity(normalized_solution,normalized_comparison)
+    similarity = cosine_similarity(normalized_solution,normalized_comparison)
     most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
+    print("Cosine similarity: ", similarity)
     print(generate_suggestion(most_significant_difference))
 
 
