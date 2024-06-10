@@ -21,6 +21,17 @@ def analyze_test_data():
             writer.writeheader()
             writer.writerows(data)
 
+    def get_solution_vector(filename:str) -> np.array:
+        solution_directory = "solution_code"
+        for file in os.scandir(solution_directory):
+            if filename[:-3] in file.name: # ignore ".py"
+                return generate_vector_from_file(solution_directory,file.name)
+
+
+    #solution data
+    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
+    vector_dict = {file : normalize_vector(get_solution_vector(file)) for file in files}
+
     #analyze data
     directory = "student_code"
     output_directory = "metric_outputs"
@@ -30,16 +41,20 @@ def analyze_test_data():
         print(student.name)
         if student.is_dir():
             for item in os.scandir(student):
-                data = generate_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
-                labeled_data = gen_labeled_vector(data) #for use in storage
-                labeled_data["id"] = student.name
-                output_file = item.name[:item.name.find(".py")] + ".csv"
-                print(output_file)
-                if output_file in output_files:
+                if item.name in files:
+                    data = generate_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
+                    norm_data = normalize_vector(data)
+                    cosine_similarity = calculate_cosine_similarity(vector_dict[item.name],norm_data)
+                    labeled_data = gen_labeled_vector(data) #for use in storage
+                    labeled_data["id"] = student.name
+                    labeled_data["cos similarity"] = cosine_similarity
+                    
+                    output_file = item.name[:-3] + ".csv"
+                    
                     all_data[output_file].append(labeled_data)
     
     #header names
-    fields = ["id"]
+    fields = ["id", "cos similarity"]
     fields += [data_type.name for data_type in data_order]
     for file, data in all_data.items():
         write_to_csv(data,fields,file)
@@ -64,13 +79,13 @@ def analyze_vectors():
     normalized_comparison = normalize_vector(comparison_vector)
     print("norm global: ",normalized_comparison)
     
-    similarity = cosine_similarity(normalized_solution,normalized_comparison)
+    similarity = calculate_cosine_similarity(normalized_solution,normalized_comparison)
     most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
     print("Cosine similarity: ", similarity)
     print(generate_suggestion(most_significant_difference))
 
 
-    
+
     
 
 
@@ -84,7 +99,7 @@ def normalize_vector(vector:np.array) -> np.array:
         return vector
 
 
-def cosine_similarity(norm_solution_vector:np.array, norm_comparison_vector:np.array) -> float:
+def calculate_cosine_similarity(norm_solution_vector:np.array, norm_comparison_vector:np.array) -> float:
     """
     After normalizing the vectors the equation for cos(theta) reduces to the dot product of the vectors
     """
