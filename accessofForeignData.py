@@ -29,7 +29,11 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Adds assigned variables to the corresponding list. When these variables appear later in the function, they do not increase the AOFD.
   def visit_Assign(self, node):
-    if (not self.assigned.__contains__(node.targets[0].id)):
+    if isinstance(node.targets[0], ast.Tuple):
+      for element in node.targets[0].elts :
+        if (not self.assigned.__contains__(element)):
+          self.assigned.append(element)
+    elif (not self.assigned.__contains__(node.targets[0].id)):
       self.assigned.append(node.targets[0].id)
     self.generic_visit(node)
 
