@@ -17,17 +17,32 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
             writer = csv.DictWriter(csv_file,fieldnames=headers)
             writer.writeheader()
             writer.writerows(data)
+
+    def generate_solution_vectors(solution_directory:str,solution_files:set) -> dict:
+        vecMap = {}
+        for file in solution_files:
+            solution_data = vector_generator(f"{solution_directory}",file)
+            corresponding_input_file = file[:file.index("_solution.py")] + ".py"
+            vecMap[corresponding_input_file] = solution_data
+        return vecMap
+
     
     
     output_files = {file[:-3] + ".csv" for file in files}
     all_data = {file : [] for file in output_files}
+    solution_files = {file[:-3] + "_solution.py" for file in files}
+    solution_dict = generate_solution_vectors(solution_directory,solution_files)
+    
     for student in os.scandir(input_directory):
         if student.is_dir():
             for item in os.scandir(student):
                 if item.name in files:
                     data = vector_generator(f"{input_directory}/{student.name}",item.name) #for use in computation
+                    cos_sim = calculate_cosine_similarity(normalize_vector(solution_dict[item.name]),normalize_vector(data))
+
                     labeled_data = gen_labeled_vector(data,data_schema) #for use in storage
                     labeled_data["id"] = student.name
+                    labeled_data["cos similarity"] = cos_sim
     
                     output_file = item.name[:-3] + ".csv"
                     
@@ -37,18 +52,19 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
 
 
     for file in solution_files:
+        dictKey = file[:file.index("_solution.py")] + ".py"
         
-        solution_data = vector_generator(f"{solution_directory}",file)
-        labeled_data = gen_labeled_vector(solution_data,data_schema)
-        labeled_data["id"] = "solution"
-
+        labeled_solution = gen_labeled_vector(solution_dict[dictKey],data_schema)
+        labeled_solution["id"] = "solution"
+        labeled_solution["cos similarity"] = 1
+        
         output_file = file[:file.index("_solution.py")] + ".csv"
         
-        all_data[output_file].append(labeled_data)
+        all_data[output_file].append(labeled_solution)
 
 
     #header names
-    fields = ["id"]
+    fields = ["id","cos similarity"]
     fields += [data_type.name for data_type in data_schema]
     for file, data in all_data.items():
         write_to_csv(data,fields,file)
