@@ -1,4 +1,4 @@
-NotAI = subset(`hw2_garden.(1)`, Label != 0)
+NotAI = subset(hw2_garden, Label != 0)
 NotAI = subset(NotAI, global_code_volume != 238)
 
 Decent = subset(NotAI, Label > 2)
