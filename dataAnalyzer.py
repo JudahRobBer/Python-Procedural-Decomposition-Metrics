@@ -23,6 +23,7 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
         for file in solution_files:
             solution_data = vector_generator(f"{solution_directory}",file)
             corresponding_input_file = file[:file.index("_solution.py")] + ".py"
+            vecMap[file] = solution_data
             vecMap[corresponding_input_file] = solution_data
         return vecMap
 
@@ -52,9 +53,7 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
 
 
     for file in solution_files:
-        dictKey = file[:file.index("_solution.py")] + ".py"
-        
-        labeled_solution = gen_labeled_vector(solution_dict[dictKey],data_schema)
+        labeled_solution = gen_labeled_vector(solution_dict[file],data_schema)
         labeled_solution["id"] = "solution"
         labeled_solution["cos similarity"] = 1
         
