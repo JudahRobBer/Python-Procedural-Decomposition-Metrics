@@ -10,7 +10,7 @@ Module to handle the comparison and analysis of procedural decomposition vectors
 
 
 
-def analyze_data_generic(files:set,input_directory:str,output_directory:str,vector_generator,data_schema:IntEnum):
+def analyze_data_generic(files:set,input_directory:str,output_directory:str,solution_directory:str,vector_generator,data_schema:IntEnum):
     
     def write_to_csv(data:list,headers:list,output_file:str) -> None:
         with open(f"{output_directory}/{output_file}", 'w') as csv_file:
@@ -23,22 +23,28 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,vect
     all_data = {file : [] for file in output_files}
     for student in os.scandir(input_directory):
         if student.is_dir():
-            print(student.name)
             for item in os.scandir(student):
-                print(item.name)
                 if item.name in files:
                     data = vector_generator(f"{input_directory}/{student.name}",item.name) #for use in computation
                     labeled_data = gen_labeled_vector(data,data_schema) #for use in storage
                     labeled_data["id"] = student.name
-                    print(labeled_data)
+    
                     output_file = item.name[:-3] + ".csv"
                     
                     all_data[output_file].append(labeled_data)
     
-    garden_solution = vector_generator("solution_code","hw2_garden_solution.py")
-    labeled_solution = gen_labeled_vector(garden_solution,data_schema)
-    labeled_solution["id"] = "solution"
-    all_data["hw2_garden.csv"].append(labeled_solution)
+    solution_files = {file[:-3] + "_solution.py" for file in files}
+
+
+    for file in solution_files:
+        
+        solution_data = vector_generator(f"{solution_directory}",file)
+        labeled_data = gen_labeled_vector(solution_data,data_schema)
+        labeled_data["id"] = "solution"
+
+        output_file = file[:file.index("_solution.py")] + ".csv"
+        
+        all_data[output_file].append(labeled_data)
 
 
     #header names
@@ -59,7 +65,8 @@ def analyze_data_with_guidelines():
     Considerations 3 and 4 are considered in comparison to an optimally decomposed solution
     """
     files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",vector_generator=gen_guidelines_vector,data_schema=guidelines_data_order)
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
+                         solution_directory="solution_code",vector_generator=gen_guidelines_vector,data_schema=guidelines_data_order)
     
 
 
@@ -72,7 +79,8 @@ def analyze_data():
     3) write formatted analysis to a csv file
      """
     files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",vector_generator=gen_vector_from_file,data_schema=data_order)
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
+                         solution_directory="solution_code",vector_generator=gen_vector_from_file,data_schema=data_order)
 
    
 
