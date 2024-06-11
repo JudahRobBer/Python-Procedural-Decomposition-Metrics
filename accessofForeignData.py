@@ -54,4 +54,9 @@ class accessofForeignData(ast.NodeVisitor):
   def ret_St_Dev_Access(self):
     if len(self.foreign_access_count) > 1:
       return statistics.stdev(self.foreign_access_count)
+    return -1.0
 
+  #Returns the maximum of foreign elements accessed across file methods.
+  def ret_Max_Access(self):
+    return max(self.foreign_access_count)
+    
