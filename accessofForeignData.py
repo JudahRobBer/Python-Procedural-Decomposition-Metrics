@@ -1,4 +1,5 @@
 import ast
+import statistics
 
 class accessofForeignData(ast.NodeVisitor):
   def __init__(self):
@@ -46,5 +47,10 @@ class accessofForeignData(ast.NodeVisitor):
       checker = accessofForeignData()
 
       checker.generic_visit(tree)
-      # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
-      return (checker.foreign_access_count)
+
+  def ret_Mean_Access(self):
+    return statistics.mean(self.foreign_access_count.values())
+
+  def ret_St_Dev_Access(self):
+    return statistics.stdev(self.foreign_access_count.values())
+    
