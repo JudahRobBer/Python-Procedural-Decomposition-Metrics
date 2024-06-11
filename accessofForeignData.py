@@ -4,6 +4,7 @@ import statistics
 class accessofForeignData(ast.NodeVisitor):
   def __init__(self):
     self.assigned = []
+    self.function_names = ["global"]
     self.foreign_access_count = [0]
     self.allowed_names = ["print","range","import","len","int","str","float","self"]
 
@@ -12,7 +13,7 @@ class accessofForeignData(ast.NodeVisitor):
   def visit_FunctionDef(self, node):
     self.assigned = []
     self.foreign_access_count.append(0) 
-    
+    self.function_names.append(node.name)
     self.generic_visit(node)
 
   # Program should not count repeated calls of an imported library's methods as foreign.
@@ -54,4 +55,16 @@ class accessofForeignData(ast.NodeVisitor):
   def ret_St_Dev_Access(self):
     if len(self.foreign_access_count) > 1:
       return statistics.stdev(self.foreign_access_count)
+    return -1.0
 
+  #Returns the maximum of foreign elements accessed across file methods.
+  def ret_Max_Access(self):
+    return max(self.foreign_access_count)
+
+  #Returns the name of the method with the maximum foreign elements accessed.
+  def ret_Max_Name(self):
+    maximum = self.ret_Max_Access()
+
+    for quant in range(len(self.foreign_access_count)):
+      if self.foreign_access_count[quant] == maximum :
+        return self.function_names[quant]
