@@ -100,8 +100,11 @@ class PrintingFunctionsVisitor(ast.NodeVisitor):
         self.generic_visit(node)
     
     def visit_Call(self,node:ast.FunctionDef):
-        if node.func.id == "print":
-            self.printing_functions.add(self.current_function)
+        try:
+            if node.func.id == "print":
+                self.printing_functions.add(self.current_function)
+        except Exception:
+            pass
         self.generic_visit(node)
 
     
@@ -115,8 +118,9 @@ def get_multiple_output_functions(package:str,filename:str) -> set:
     printing_visitor = PrintingFunctionsVisitor()
     traverse_graph_utility(package,filename,printing_visitor)
     printing_functions = printing_visitor.printing_functions
-
+    
     violating_functions = returning_functions.intersection(printing_functions)
+    
 
     return violating_functions
 

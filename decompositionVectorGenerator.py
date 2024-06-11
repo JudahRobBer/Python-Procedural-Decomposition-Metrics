@@ -4,6 +4,7 @@ Module to compose all relevant information about the source code into a vectoriz
 from augmentedCallGraphGenerator import AugmentedCallGraph,generate_augmented_call_graph
 from complexityMetricGenerator import get_average_cyclomatic_complexity, get_average_cognitive_complexity
 from ast_analysis import get_global_code_volume, get_multiple_output_functions
+from accessofForeignData import accessofForeignData
 import numpy as np
 from enum import IntEnum
 
@@ -11,16 +12,23 @@ class guidelines_data_order(IntEnum):
     reused_nodes = 0
     multiple_output_functions = 1
     largest_information_function = 2
+    global_code_volume = 3
 
-def generate_guideline_vector(package:str,filename:str) -> np.array:
+def gen_guidelines_vector(package:str,filename:str) -> np.array:
     #reused node count, information size of biggest class, multiple output count
     augmented_cg = generate_augmented_call_graph(package,filename)
     reused_nodes = augmented_cg.count_reused_leafs()
 
     #multiple output_functions
-    multiple_output_functions = get_multiple_output_functions(package,filename)
+    multiple_output_functions_count = len(get_multiple_output_functions(package,filename))
 
     #function with largest information load
+    foreignAccess = accessofForeignData()
+    foreignAccess.get_Foreign_Access(package,filename)
+    largest_function_size = foreignAccess.ret_Max_Access()
+
+
+    return np.array([reused_nodes,multiple_output_functions_count,largest_function_size],dtype=float)
 
 
 
@@ -35,7 +43,7 @@ class data_order(IntEnum):
     cog_complexity = 5
 
 
-def generate_vector_from_file(package:str, filename:str) -> np.array:
+def gen_vector_from_file(package:str, filename:str) -> np.array:
 
     augmented_cg = generate_augmented_call_graph(package,filename)
     global_code_volume = get_global_code_volume(package,filename)
@@ -55,7 +63,7 @@ def generate_vector_from_file(package:str, filename:str) -> np.array:
     return np.array(lst,dtype=float) 
 
 
-def gen_labeled_vector(vector:np.array) -> dict:
+def gen_labeled_vector(vector:np.array, labeling:IntEnum) -> dict:
     """
     Generate a labeled form of the vector for use in writing data
     Pythons dicts are preferred for this purpose because the generated list is used 
@@ -63,10 +71,12 @@ def gen_labeled_vector(vector:np.array) -> dict:
     """
     index = 0
     data_dict = {}
-    for data_type in data_order:
+    for data_type in labeling:
         data_dict[data_type.name] = vector[index]
         index += 1
     
     return data_dict
+
+
 
 

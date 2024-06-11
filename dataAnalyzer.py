@@ -1,4 +1,5 @@
-from decompositionVectorGenerator import generate_vector_from_file, gen_labeled_vector, data_order
+from decompositionVectorGenerator import gen_vector_from_file, gen_labeled_vector, data_order
+from decompositionVectorGenerator import gen_guidelines_vector, guidelines_data_order
 import numpy as np
 import os
 import csv
@@ -27,6 +28,29 @@ def analyze_data_with_guidelines():
     files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
 
     #data needed: global code volume, reused leaf count, multiple-output count, biggest function information size
+    directory = "student_code"
+    output_directory = "metric_outputs"
+    output_files = {"hw2_garden.csv","hw2_owls.csv","hw2_tower.csv"}
+    all_data = {file : [] for file in output_files}
+    for student in os.scandir(directory):
+        if student.is_dir():
+            print(student.name)
+            for item in os.scandir(student):
+                print(item.name)
+                if item.name in files:
+                    data = gen_guidelines_vector(f"{directory}/{student.name}",item.name) #for use in computation
+                    labeled_data = gen_labeled_vector(data,guidelines_data_order) #for use in storage
+                    labeled_data["id"] = student.name
+                    print(labeled_data)
+                    output_file = item.name[:-3] + ".csv"
+                    
+                    all_data[output_file].append(labeled_data)
+    
+    #header names
+    fields = ["id"]
+    fields += [data_type.name for data_type in guidelines_data_order]
+    for file, data in all_data.items():
+        write_to_csv(data,fields,file)
 
 
 
@@ -69,7 +93,7 @@ def analyze_data():
         if student.is_dir():
             for item in os.scandir(student):
                 if item.name in files:
-                    data = generate_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
+                    data = gen_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
                     norm_data = normalize_vector(data)
                     cosine_similarity = calculate_cosine_similarity(vector_dict[item.name],norm_data)
                     labeled_data = gen_labeled_vector(data) #for use in storage
@@ -166,6 +190,19 @@ def generate_suggestion(feature:int) -> str:
             optimally decomposed solution. Ensure that your functions are following the single responsibility principle
             by making sure that all of the code in your function works together to accomplish a single, concise purpose
             """
+        
+    
+def analyze_vectors():
+    """
+    function documents relevant analysis behavior and provides sample output
+    """
+    #currently used to test multiple function output types
+    #ignore
+    directory = "student_code/s1"
+    filename = "hw2_garden.py"
+    gen_guidelines_vector(directory,filename)
+
+    
 
 
 analyze_data_with_guidelines()
