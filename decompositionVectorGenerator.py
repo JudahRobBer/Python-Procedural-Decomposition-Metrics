@@ -14,7 +14,8 @@ class guidelines_data_order(IntEnum):
     largest_information_function = 2
     global_code_volume = 3
 
-def gen_guidelines_vector(package:str,filename:str) -> np.array:
+def gen_guidelines_vector(package:str,filename:str):
+    
     #reused node count, information size of biggest class, multiple output count
     augmented_cg = generate_augmented_call_graph(package,filename)
     reused_nodes = augmented_cg.count_reused_leafs()
@@ -27,9 +28,11 @@ def gen_guidelines_vector(package:str,filename:str) -> np.array:
     foreignAccess.get_Foreign_Access(package,filename)
     largest_function_size = foreignAccess.ret_Max_Access()
 
+    global_code_volume = get_global_code_volume(package,filename)
 
-    return np.array([reused_nodes,multiple_output_functions_count,largest_function_size],dtype=float)
 
+    return np.array([reused_nodes,multiple_output_functions_count,largest_function_size,global_code_volume],dtype=float)
+    
 
 
 #enum matching the type of data to its index in the original vector

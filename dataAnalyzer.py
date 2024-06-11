@@ -3,9 +3,43 @@ from decompositionVectorGenerator import gen_guidelines_vector, guidelines_data_
 import numpy as np
 import os
 import csv
+from enum import IntEnum
 """
 Module to handle the comparison and analysis of procedural decomposition vectors
 """
+
+
+
+def analyze_data_generic(files:set,input_directory:str,output_directory:str,vector_generator,data_schema:IntEnum):
+    
+    def write_to_csv(data:list,headers:list,output_file:str) -> None:
+        with open(f"{output_directory}/{output_file}", 'w') as csv_file:
+            writer = csv.DictWriter(csv_file,fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(data)
+    
+    
+    output_files = {file[:-3] + ".csv" for file in files}
+    all_data = {file : [] for file in output_files}
+    for student in os.scandir(input_directory):
+        if student.is_dir():
+            print(student.name)
+            for item in os.scandir(student):
+                print(item.name)
+                if item.name in files:
+                    data = vector_generator(f"{input_directory}/{student.name}",item.name) #for use in computation
+                    labeled_data = gen_labeled_vector(data,data_schema) #for use in storage
+                    labeled_data["id"] = student.name
+                    print(labeled_data)
+                    output_file = item.name[:-3] + ".csv"
+                    
+                    all_data[output_file].append(labeled_data)
+    
+    #header names
+    fields = ["id"]
+    fields += [data_type.name for data_type in data_schema]
+    for file, data in all_data.items():
+        write_to_csv(data,fields,file)
 
 def analyze_data_with_guidelines():
     """
@@ -18,100 +52,24 @@ def analyze_data_with_guidelines():
 
     Considerations 3 and 4 are considered in comparison to an optimally decomposed solution
     """
-    def write_to_csv(data:list,headers:list,output_file:str) -> None:
-        with open(f"{output_directory}/{output_file}", 'w') as csv_file:
-            writer = csv.DictWriter(csv_file,fieldnames=headers)
-            writer.writeheader()
-            writer.writerows(data)
-    
-    output_directory = "metric_outputs"
     files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-
-    #data needed: global code volume, reused leaf count, multiple-output count, biggest function information size
-    directory = "student_code"
-    output_directory = "metric_outputs"
-    output_files = {"hw2_garden.csv","hw2_owls.csv","hw2_tower.csv"}
-    all_data = {file : [] for file in output_files}
-    for student in os.scandir(directory):
-        if student.is_dir():
-            print(student.name)
-            for item in os.scandir(student):
-                print(item.name)
-                if item.name in files:
-                    data = gen_guidelines_vector(f"{directory}/{student.name}",item.name) #for use in computation
-                    labeled_data = gen_labeled_vector(data,guidelines_data_order) #for use in storage
-                    labeled_data["id"] = student.name
-                    print(labeled_data)
-                    output_file = item.name[:-3] + ".csv"
-                    
-                    all_data[output_file].append(labeled_data)
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",vector_generator=gen_guidelines_vector,data_schema=guidelines_data_order)
     
-    #header names
-    fields = ["id"]
-    fields += [data_type.name for data_type in guidelines_data_order]
-    for file, data in all_data.items():
-        write_to_csv(data,fields,file)
 
 
-
-
-
-""" 
 def analyze_data():
-    
+    """ 
     Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
     
     1) Iterate over every file
     2) Generate analysis for each file
     3) write formatted analysis to a csv file
-    
-
-    def write_to_csv(data:list,headers:list,output_file:str) -> None:
-        with open(f"{output_directory}/{output_file}", 'w') as csv_file:
-            writer = csv.DictWriter(csv_file,fieldnames=headers)
-            writer.writeheader()
-            writer.writerows(data)
-
-    def get_solution_vector(filename:str) -> np.array:
-        solution_directory = "solution_code"
-        for file in os.scandir(solution_directory):
-            if filename[:-3] in file.name: # ignore ".py"
-                return generate_vector_from_file(solution_directory,file.name)
-
-
-    #solution data
+     """
     files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-    vector_dict = {file : normalize_vector(get_solution_vector(file)) for file in files}
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",vector_generator=gen_vector_from_file,data_schema=data_order)
 
-    #analyze data
-    directory = "student_code"
-    output_directory = "metric_outputs"
-    output_files = {"hw2_garden.csv","hw2_owls.csv","hw2_tower.csv"}
-    all_data = {file : [] for file in output_files}
-    for student in os.scandir(directory):
-        print(student.name)
-        if student.is_dir():
-            for item in os.scandir(student):
-                if item.name in files:
-                    data = gen_vector_from_file(f"{directory}/{student.name}",item.name) #for use in computation
-                    norm_data = normalize_vector(data)
-                    cosine_similarity = calculate_cosine_similarity(vector_dict[item.name],norm_data)
-                    labeled_data = gen_labeled_vector(data) #for use in storage
-                    labeled_data["id"] = student.name
-                    labeled_data["cos similarity"] = cosine_similarity
-                    
-                    output_file = item.name[:-3] + ".csv"
-                    
-                    all_data[output_file].append(labeled_data)
-    
-    #header names
-    fields = ["id", "cos similarity"]
-    fields += [data_type.name for data_type in data_order]
-    for file, data in all_data.items():
-        write_to_csv(data,fields,file)
-"""
+   
 
-    
 def normalize_vector(vector:np.array) -> np.array:
     """
     u = (1 / |v|) * v
