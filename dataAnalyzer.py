@@ -35,6 +35,12 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,vect
                     
                     all_data[output_file].append(labeled_data)
     
+    garden_solution = vector_generator("solution_code","hw2_garden_solution.py")
+    labeled_solution = gen_labeled_vector(garden_solution,data_schema)
+    labeled_solution["id"] = "solution"
+    all_data["hw2_garden.csv"].append(labeled_solution)
+
+
     #header names
     fields = ["id"]
     fields += [data_type.name for data_type in data_schema]
