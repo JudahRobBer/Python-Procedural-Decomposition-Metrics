@@ -3,17 +3,16 @@ import statistics
 
 class accessofForeignData(ast.NodeVisitor):
   def __init__(self):
-    self.func_name = "global"
     self.assigned = []
-    self.foreign_access_count = {"global": 0}
-    self.allowed_names = ["print","range","import","len","int","str","float"]
+    self.foreign_access_count = [0]
+    self.allowed_names = ["print","range","import","len","int","str","float","self"]
 
   # Adds a new key to the return dictionary for each function.
   # Resets the list of variables defined in that function.
   def visit_FunctionDef(self, node):
-    self.func_name = node.name
     self.assigned = []
-    self.foreign_access_count[self.func_name] = 0 
+    self.foreign_access_count.append(0) 
+    
     self.generic_visit(node)
 
   # Program should not count repeated calls of an imported library's methods as foreign.
@@ -35,8 +34,8 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Increments the AOFD for the corresponding function when a variable not defined in it is accessed.
   def visit_Name(self, node):
-    if ((not self.assigned.__contains__(node.id)) and (not self.allowed_names.__contains__(node.id)):
-      self.foreign_access_count[self.func_name] += 1
+    if (not self.assigned.__contains__(node.id)) and (not self.allowed_names.__contains__(node.id)):
+      self.foreign_access_count[len(self.foreign_access_count) - 1] += 1
     self.generic_visit(node)
 
   def get_Foreign_Access(self, package: str, filename: str):
@@ -44,15 +43,15 @@ class accessofForeignData(ast.NodeVisitor):
       source_code = file.read()
        
       tree = ast.parse(source_code)
-      checker = accessofForeignData()
 
-      checker.generic_visit(tree)
+      self.generic_visit(tree)
       
   #Returns the average count of foreign elements accessed across file methods.
   def ret_Mean_Access(self):
-    return statistics.mean(self.foreign_access_count.values())
+    return statistics.mean(self.foreign_access_count)
 
   #Returns the standard deviation of foreign elements that are accessed across file methods.
   def ret_St_Dev_Access(self):
-    return statistics.stdev(self.foreign_access_count.values())
-    
+    if len(self.foreign_access_count) > 1:
+      return statistics.stdev(self.foreign_access_count)
+
