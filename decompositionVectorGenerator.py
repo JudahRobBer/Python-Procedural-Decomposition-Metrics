@@ -3,7 +3,7 @@ Module to compose all relevant information about the source code into a vectoriz
 """
 from augmentedCallGraphGenerator import AugmentedCallGraph,generate_augmented_call_graph
 from complexityMetricGenerator import get_average_cyclomatic_complexity, get_average_cognitive_complexity
-from ast_analysis import get_global_code_volume
+from ast_analysis import get_global_code_volume, get_multiple_output_functions
 import numpy as np
 from enum import IntEnum
 
@@ -20,6 +20,9 @@ class data_order(IntEnum):
 
 
 def generate_vector_from_file(package:str, filename:str) -> np.array:
+    #not included in vector
+    violating_functions = get_multiple_output_functions(package,filename)
+
     augmented_cg = generate_augmented_call_graph(package,filename)
     global_code_volume = get_global_code_volume(package,filename)
     
@@ -35,7 +38,7 @@ def generate_vector_from_file(package:str, filename:str) -> np.array:
     lst = [global_code_volume,reused_node_count,leaf_nonLeaf_ratio,
            transitivity,avg_cyclomatic_complexity, avg_cognitive_complexity]
     
-    return np.array(lst,dtype=float)
+    return np.array(lst,dtype=float) 
 
 
 def gen_labeled_vector(vector:np.array) -> dict:

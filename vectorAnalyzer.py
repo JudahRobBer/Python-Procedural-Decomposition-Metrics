@@ -6,7 +6,7 @@ import csv
 Module to handle the comparison and analysis of procedural decomposition vectors
 """
 
-def analyze_test_data():
+def analyze_data():
     """
     Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
     
@@ -65,25 +65,12 @@ def analyze_vectors():
     """
     function documents relevant analysis behavior and provides sample output
     """
-    package = "testpackage"
-    decomposed = "drivetimes.py"
-    globallyScoped = "drivetimesGlobal.py"
+    #currently used to test multiple function output types
+    #ignore
+    directory = "student_code/s1"
+    filename = "hw2_garden.py"
+    generate_vector_from_file(directory,filename)
     
-    solution_vector = generate_vector_from_file(package,decomposed)
-    comparison_vector = generate_vector_from_file(package,globallyScoped)
-    print("Original solution vector: ", solution_vector)
-    print("Original global vector: ", comparison_vector)
-    
-    normalized_solution = normalize_vector(solution_vector)
-    print("norm_solution: ",normalized_solution)
-    normalized_comparison = normalize_vector(comparison_vector)
-    print("norm global: ",normalized_comparison)
-    
-    similarity = calculate_cosine_similarity(normalized_solution,normalized_comparison)
-    most_significant_difference = get_most_significant_difference(normalized_solution,normalized_comparison)
-    print("Cosine similarity: ", similarity)
-    print(generate_suggestion(most_significant_difference))
-
 
 
     
@@ -170,4 +157,4 @@ def generate_suggestion(feature:int) -> str:
             """
 
 
-analyze_test_data()
+analyze_data()

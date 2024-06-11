@@ -64,6 +64,64 @@ def get_global_code_volume(package:str,filename:str) -> int:
     traverse_graph_utility(package,filename,visitor)
     return visitor.information_count
 
+class ReturningFunctionsVisitor(ast.NodeVisitor):
+    """
+    Get the set of all functions with return values
+    """
+
+    def __init__(self):
+        self.returning_functions = set()
+        self.current_function = None
+
+    def visit_FunctionDef(self, node: ast.FunctionDef):
+        self.current_function = node.name
+        self.generic_visit(node)
+    
+    def visit_Return(self,node:ast.Return):
+        self.returning_functions.add(self.current_function)
+        self.generic_visit(node)
+
+
+class PrintingFunctionsVisitor(ast.NodeVisitor):
+    """
+    Gets the set of all functions with print statements
+    """
+    def __init__(self):
+        self.printing_functions = set()
+        self.current_function = None
+
+
+    def visit_FunctionDef(self, node: ast.FunctionDef):
+        self.current_function = node.name
+        self.generic_visit(node)
+    
+    def visit_Call(self,node:ast.FunctionDef):
+        if node.func.id == "print":
+            self.printing_functions.add(self.current_function)
+        self.generic_visit(node)
+
+    
+    
+
+def get_multiple_output_functions(package:str,filename:str) -> set:
+    returning_visitor = ReturningFunctionsVisitor()
+    traverse_graph_utility(package,filename,returning_visitor)
+    returning_functions = returning_visitor.returning_functions
+    
+    printing_visitor = PrintingFunctionsVisitor()
+    traverse_graph_utility(package,filename,printing_visitor)
+    printing_functions = printing_visitor.printing_functions
+
+    violating_functions = returning_functions.intersection(printing_functions)
+
+    return violating_functions
+
+    
+    
+
+        
+
+
 
 
 
