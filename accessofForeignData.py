@@ -47,10 +47,12 @@ class accessofForeignData(ast.NodeVisitor):
       checker = accessofForeignData()
 
       checker.generic_visit(tree)
-
+      
+  #Returns the average count of foreign elements accessed across file methods.
   def ret_Mean_Access(self):
     return statistics.mean(self.foreign_access_count.values())
 
+  #Returns the standard deviation of foreign elements that are accessed across file methods.
   def ret_St_Dev_Access(self):
     return statistics.stdev(self.foreign_access_count.values())
     
