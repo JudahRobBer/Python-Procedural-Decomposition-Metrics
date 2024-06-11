@@ -17,8 +17,8 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Program should not count repeated calls of an imported library's methods as foreign.
   def visit_Import(self, node):
-    self.allowed_names.append(node.names[0].name)
     self.generic_visit(node)
+    self.allowed_names.append(node.names[0].name)
 
   # Adds index variables corresponding to for loops to the "assigned" list.
   def visit_For(self, node):
@@ -34,13 +34,7 @@ class accessofForeignData(ast.NodeVisitor):
 
   # Increments the AOFD for the corresponding function when a variable not defined in it is accessed.
   def visit_Name(self, node):
-    allowed = True
-    for name in self.allowed_names:
-      if name == node.id:
-        allowed = False
-        break
-    
-    if ((not self.assigned.__contains__(node.id)) and allowed):
+    if ((not self.assigned.__contains__(node.id)) and (not self.allowed_names.__contains__(node.id)):
       self.foreign_access_count[self.func_name] += 1
     self.generic_visit(node)
 
@@ -50,10 +44,6 @@ class accessofForeignData(ast.NodeVisitor):
        
       tree = ast.parse(source_code)
       checker = accessofForeignData()
-
-      checker.generic_visit(tree)
-      # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
-      return (checker.foreign_access_count)
 
       checker.generic_visit(tree)
       # Returns a dictionary of each function and the corresponding number of references to values defined outside of that function.
