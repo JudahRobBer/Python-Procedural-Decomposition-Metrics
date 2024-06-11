@@ -4,7 +4,7 @@ Interface for complexipy and radon to collect complexity metrics.
 Returns data as an average of each metric for the respective functions
 """
 
-import radon.complexity
+import radon.complexity, radon.metrics
 import os
 import csv
 import time
@@ -23,6 +23,12 @@ def get_cyclomatic_complexity_dictionary(package:str,filename:str):
 
         return ret_Dict
 
+def get_maintainability_index(package:str,filename:str):
+    with open(f"{package}/{filename}") as file:
+        source = file.read()
+        maintainability = radon.metrics.mi_visit(source)
+    
+    return maintainability
 
 
 def get_average_cyclomatic_complexity(package:str,filename:str) -> float:

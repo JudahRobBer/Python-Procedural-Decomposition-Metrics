@@ -53,6 +53,10 @@ class GlobalCodeVisitor(ast.NodeVisitor):
         """
         pass
 
+    def visit_Import(self,node):
+        pass
+        
+
     def generic_visit(self,node):
         self.information_count += 1
         super().generic_visit(node)

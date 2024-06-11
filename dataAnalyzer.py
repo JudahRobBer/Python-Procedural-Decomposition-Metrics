@@ -6,14 +6,41 @@ import csv
 Module to handle the comparison and analysis of procedural decomposition vectors
 """
 
-def analyze_data():
+def analyze_data_with_guidelines():
     """
+    Generate a csv file containing analysis of metrics according to current guidelines
+
+    1) Is your code globally scoped? (Yes/No)
+    2) How many of your functions return and print values? (count)
+    3) How much data (inputs, parameters, and function calls) does your biggest function need? (diff)
+    4) Is there shared behavior between functions thats being appropriately abstracted (count)
+
+    Considerations 3 and 4 are considered in comparison to an optimally decomposed solution
+    """
+    def write_to_csv(data:list,headers:list,output_file:str) -> None:
+        with open(f"{output_directory}/{output_file}", 'w') as csv_file:
+            writer = csv.DictWriter(csv_file,fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(data)
+    
+    output_directory = "metric_outputs"
+    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
+
+    #data needed: global code volume, reused leaf count, multiple-output count, biggest function information size
+
+
+
+
+
+""" 
+def analyze_data():
+    
     Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
     
     1) Iterate over every file
     2) Generate analysis for each file
     3) write formatted analysis to a csv file
-    """
+    
 
     def write_to_csv(data:list,headers:list,output_file:str) -> None:
         with open(f"{output_directory}/{output_file}", 'w') as csv_file:
@@ -58,24 +85,9 @@ def analyze_data():
     fields += [data_type.name for data_type in data_order]
     for file, data in all_data.items():
         write_to_csv(data,fields,file)
-
-
-    
-def analyze_vectors():
-    """
-    function documents relevant analysis behavior and provides sample output
-    """
-    #currently used to test multiple function output types
-    #ignore
-    directory = "student_code/s1"
-    filename = "hw2_garden.py"
-    generate_vector_from_file(directory,filename)
-    
-
+"""
 
     
-
-
 def normalize_vector(vector:np.array) -> np.array:
     """
     u = (1 / |v|) * v
@@ -106,7 +118,6 @@ def get_most_significant_difference(norm_solution_vector:np.array, norm_comparis
     diff_vector = norm_solution_vector - norm_comparison_vector
     #sort vector maintaining index as (original index,value) tuples
     labeled_sorted_diff_vector = sorted(enumerate(diff_vector),key= lambda x: x[1])
-    print("difference vector: ",labeled_sorted_diff_vector)
     most_significant_diff = labeled_sorted_diff_vector[0]
 
     #if the most significant difference relates to the graph structure, but the students code is totally global,
@@ -157,4 +168,4 @@ def generate_suggestion(feature:int) -> str:
             """
 
 
-analyze_data()
+analyze_data_with_guidelines()

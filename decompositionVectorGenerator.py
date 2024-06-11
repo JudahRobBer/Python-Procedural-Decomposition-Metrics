@@ -7,6 +7,22 @@ from ast_analysis import get_global_code_volume, get_multiple_output_functions
 import numpy as np
 from enum import IntEnum
 
+class guidelines_data_order(IntEnum):
+    reused_nodes = 0
+    multiple_output_functions = 1
+    largest_information_function = 2
+
+def generate_guideline_vector(package:str,filename:str) -> np.array:
+    #reused node count, information size of biggest class, multiple output count
+    augmented_cg = generate_augmented_call_graph(package,filename)
+    reused_nodes = augmented_cg.count_reused_leafs()
+
+    #multiple output_functions
+    multiple_output_functions = get_multiple_output_functions(package,filename)
+
+    #function with largest information load
+
+
 
 #enum matching the type of data to its index in the original vector
 #used for later analysis of the data to make code more explicit
@@ -20,8 +36,6 @@ class data_order(IntEnum):
 
 
 def generate_vector_from_file(package:str, filename:str) -> np.array:
-    #not included in vector
-    violating_functions = get_multiple_output_functions(package,filename)
 
     augmented_cg = generate_augmented_call_graph(package,filename)
     global_code_volume = get_global_code_volume(package,filename)
