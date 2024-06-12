@@ -104,11 +104,11 @@ def score_data_with_guidelines(student:np.array,solution:np.array) -> float:
     """
     Calculates a normalized score of the student code
     """
-    def compare_values_by_index(index: int, comparison:operator,threshold:int = 0):
+    def compare_values_by_index(index: int, comparison:operator,threshold:float = 0):
         return 1 if comparison(student[index],solution[index] + threshold) else 0
     
-    global_code_threshold = 5 #arbitrary
-    information_load_threshold = 5 #arbitrary
+    global_code_threshold = solution[guidelines_data_order.global_code_volume] #allowed up to double global code volume
+    information_load_threshold = solution[guidelines_data_order.largest_information_function] * .5
     
 
     #determine if the code is global

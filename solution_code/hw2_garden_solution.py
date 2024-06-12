@@ -37,3 +37,5 @@ def main() -> None:
     get_garden_plants(side_len, plant_spacing)
     get_garden_soil(side_len,soil_depth)
     get_garden_fill(side_len, fill_depth)
+
+main()
