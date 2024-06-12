@@ -4,9 +4,40 @@ import numpy as np
 import os
 import csv
 from enum import IntEnum
+import operator
 """
 Module to handle the comparison and analysis of procedural decomposition vectors
 """
+
+""" def analyze_data():
+    "
+    Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
+    
+    1) Iterate over every file
+    2) Generate analysis for each file
+    3) write formatted analysis to a csv file
+    "
+    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
+                         solution_directory="solution_code",vector_generator=gen_vector_from_file,data_schema=data_order) """
+
+
+def analyze_data_with_guidelines():
+    """
+    Generate a csv file containing analysis of metrics according to current guidelines
+
+    1) Is your code globally scoped? (Yes/No)
+    2) How many of your functions return and print values? (count)
+    3) How much data (inputs, parameters, and function calls) does your biggest function need? (diff)
+    4) Is there shared behavior between functions thats being appropriately abstracted (count)
+
+    Considerations 3 and 4 are considered in comparison to an optimally decomposed solution
+    """
+    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
+    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
+                         solution_directory="solution_code",vector_generator=gen_guidelines_vector,data_schema=guidelines_data_order)
+
+
 
 
 
@@ -39,11 +70,11 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
             for item in os.scandir(student):
                 if item.name in files:
                     data = vector_generator(f"{input_directory}/{student.name}",item.name) #for use in computation
-                    cos_sim = calculate_cosine_similarity(normalize_vector(solution_dict[item.name]),normalize_vector(data))
+                    score = score_data_with_guidelines(data,solution_dict[item.name])
 
                     labeled_data = gen_labeled_vector(data,data_schema) #for use in storage
                     labeled_data["id"] = student.name
-                    labeled_data["cos similarity"] = cos_sim
+                    labeled_data["score"] = score
     
                     output_file = item.name[:-3] + ".csv"
                     
@@ -55,7 +86,7 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
     for file in solution_files:
         labeled_solution = gen_labeled_vector(solution_dict[file],data_schema)
         labeled_solution["id"] = "solution"
-        labeled_solution["cos similarity"] = 1
+        labeled_solution["score"] = 1
         
         output_file = file[:file.index("_solution.py")] + ".csv"
         
@@ -63,39 +94,37 @@ def analyze_data_generic(files:set,input_directory:str,output_directory:str,solu
 
 
     #header names
-    fields = ["id","cos similarity"]
+    fields = ["id","score"]
     fields += [data_type.name for data_type in data_schema]
     for file, data in all_data.items():
         write_to_csv(data,fields,file)
 
-def analyze_data_with_guidelines():
-    """
-    Generate a csv file containing analysis of metrics according to current guidelines
 
-    1) Is your code globally scoped? (Yes/No)
-    2) How many of your functions return and print values? (count)
-    3) How much data (inputs, parameters, and function calls) does your biggest function need? (diff)
-    4) Is there shared behavior between functions thats being appropriately abstracted (count)
-
-    Considerations 3 and 4 are considered in comparison to an optimally decomposed solution
+def score_data_with_guidelines(student:np.array,solution:np.array) -> float:
     """
-    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
-                         solution_directory="solution_code",vector_generator=gen_guidelines_vector,data_schema=guidelines_data_order)
+    Calculates a normalized score of the student code
+    """
+    def compare_values_by_index(index: int, comparison:operator,threshold:int = 0):
+        return 1 if comparison(student[index],solution[index] + threshold) else 0
+    
+    global_code_threshold = 5 #arbitrary
+    information_load_threshold = 5 #arbitrary
     
 
-
-def analyze_data():
-    """ 
-    Generate a CSV file containing the complete analysis of all the current metrics for all the files in a given directory
+    #determine if the code is global
     
-    1) Iterate over every file
-    2) Generate analysis for each file
-    3) write formatted analysis to a csv file
-     """
-    files = {"hw2_garden.py","hw2_owls.py","hw2_tower.py"}
-    analyze_data_generic(files=files,input_directory="student_code",output_directory="metric_outputs",
-                         solution_directory="solution_code",vector_generator=gen_vector_from_file,data_schema=data_order)
+    if (student[guidelines_data_order.global_code_volume] > solution[guidelines_data_order.global_code_volume] + global_code_threshold):
+        return 0
+
+    #if not weight the 3 other scores equally
+    violating_function_score = compare_values_by_index(guidelines_data_order.multiple_output_functions,operator.le)
+    high_information_function_score = compare_values_by_index(guidelines_data_order.largest_information_function,operator.le,threshold=information_load_threshold)
+    reused_node_score = compare_values_by_index(guidelines_data_order.reused_nodes,operator.ge)
+
+    return (violating_function_score + high_information_function_score + reused_node_score) / 3
+
+
+
 
    
 

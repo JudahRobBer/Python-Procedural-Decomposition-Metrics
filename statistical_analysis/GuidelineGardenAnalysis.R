@@ -1,4 +1,4 @@
-NotAI = subset(hw2_garden, Label != 0)
+NotAI = subset(hw2_garden, id != "s2" )
 NotAI = subset(NotAI, global_code_volume != 238)
 
 Decent = subset(NotAI, Label > 2)
@@ -25,3 +25,13 @@ NotAI$predictdifference = NotAI$predicted - NotAI$Label
 
 boxplot(largest_information_function ~ Label, data = NotAI)
 boxplot(global_code_volume ~ Label, data = NotAI)
+
+ai_ids = c("s2","s8","s31")
+NotAI = subset(hw2_garden, !(id %in% ai_ids))
+NotAI = subset(NotAI, global_code_volume != 238)
+
+model = lm(score ~ largest_information_function + global_code_volume + multiple_output_functions + reused_nodes, data = NotAI)
+summary(model)
+
+
+notAI#predicted
