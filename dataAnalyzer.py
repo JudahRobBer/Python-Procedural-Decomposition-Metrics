@@ -117,11 +117,12 @@ def score_data_with_guidelines(student:np.array,solution:np.array) -> float:
         return 0
 
     #if not weight the 3 other scores equally
+    global_volume_score = 1
     violating_function_score = compare_values_by_index(guidelines_data_order.multiple_output_functions,operator.le)
     high_information_function_score = compare_values_by_index(guidelines_data_order.largest_information_function,operator.le,threshold=information_load_threshold)
     reused_node_score = compare_values_by_index(guidelines_data_order.reused_nodes,operator.ge)
 
-    return (violating_function_score + high_information_function_score + reused_node_score) / 3
+    return (violating_function_score + high_information_function_score + reused_node_score) + global_volume_score
 
 
 
