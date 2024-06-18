@@ -1,4 +1,4 @@
-import accessofForeignData, communicativeFunctionalityChecker, complexityMetricGenerator
+import machinery.accessofForeignData as accessofForeignData, machinery.communicativeFunctionalityChecker as communicativeFunctionalityChecker, machinery.complexityMetricGenerator as complexityMetricGenerator
 
 class godMethodDetector():
   def __init__(self, CFC: dict, AFD: dict, Cyc: dict):

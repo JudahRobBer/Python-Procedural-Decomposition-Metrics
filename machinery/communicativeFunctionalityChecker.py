@@ -1,5 +1,5 @@
 import ast
-from ast_analysis import traverse_graph_utility
+from machinery.ast_analysis import traverse_graph_utility
 
 def check_Uniques(lis:list, name:str):
       if (not lis.__contains__(name)) :

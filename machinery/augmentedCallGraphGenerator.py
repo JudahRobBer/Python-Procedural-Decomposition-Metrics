@@ -1,7 +1,7 @@
 import json
-from graph import DirectedGraph, AugmentedCallGraph
+from machinery.graph import DirectedGraph, AugmentedCallGraph
 from scalpel.call_graph.pycg import CallGraphGenerator, formats
-from ast_analysis import get_function_parameter_counts
+from machinery.ast_analysis import get_function_parameter_counts
 from pprint import pprint
 
 """

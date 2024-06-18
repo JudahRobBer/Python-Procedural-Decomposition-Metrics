@@ -1,5 +1,5 @@
-from decompositionVectorGenerator import gen_vector_from_file, gen_labeled_vector, data_order
-from decompositionVectorGenerator import gen_guidelines_vector, guidelines_data_order
+from machinery.decompositionVectorGenerator import gen_vector_from_file, gen_labeled_vector, data_order
+from machinery.decompositionVectorGenerator import gen_guidelines_vector, guidelines_data_order
 import numpy as np
 import os
 import csv

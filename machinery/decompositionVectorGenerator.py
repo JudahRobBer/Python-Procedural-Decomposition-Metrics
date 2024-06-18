@@ -1,10 +1,10 @@
 """
 Module to compose all relevant information about the source code into a vectorized representation
 """
-from augmentedCallGraphGenerator import AugmentedCallGraph,generate_augmented_call_graph
-from complexityMetricGenerator import get_average_cyclomatic_complexity, get_average_cognitive_complexity
-from ast_analysis import get_global_code_volume, get_multiple_output_functions
-from accessofForeignData import accessofForeignData
+from machinery.augmentedCallGraphGenerator import AugmentedCallGraph,generate_augmented_call_graph
+from machinery.complexityMetricGenerator import get_average_cyclomatic_complexity, get_average_cognitive_complexity
+from machinery.ast_analysis import get_global_code_volume, get_multiple_output_functions
+from machinery.accessofForeignData import accessofForeignData
 import numpy as np
 from enum import IntEnum
 
